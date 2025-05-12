@@ -1,9 +1,20 @@
+// Importera de nödvändiga biblioteken
 import express from 'express';
+import dotenv from 'dotenv'
+import { pool } from './db';
 
+// Initiera Express-applikationen
+dotenv.config();
 const app = express();
-const PORT = 3500;
+const PORT = 3001;
 
+// Middleware 
 app.use(express.json());
+
+// Anslut PostgreSQL för testning
+pool.connect()
+.then(()=> console.log('Connected to PostgreSQL via pg'))
+.catch((err)=> console.error(err))
 
 app.get('/', (req, res) => {
   res.send('Server is running!');
