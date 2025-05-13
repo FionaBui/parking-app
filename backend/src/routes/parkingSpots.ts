@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { pool } from '../db';
 
+
 const router = express.Router();
 
 // 🟡 Hämta alla parkeringsplatser
@@ -37,9 +38,10 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 })
 
+// GET hämta bokning 
 router.get('/:id',async(req:Request,res:Response)=>{
     const spotId = parseInt(req.params.id,10) 
-    if (!spotId){
+    if (isNaN(spotId)){
         res.status(400).json({error: 'Invalid id' })
         return
     }
@@ -54,6 +56,37 @@ router.get('/:id',async(req:Request,res:Response)=>{
     } catch (error) {
         console.error('Error getting spot',error)
         res.status(500).json({error: 'Server error'})
+    }
+})
+
+// PUT Uppdatera platsinformation
+router.put('/:id', async(req:Request, res:Response)=>{
+    const spotId = parseInt(req.params.id, 10)
+    const {location, start_time, end_time, price} = req.body
+
+    if(isNaN(spotId)){
+        res.status(400).json({error: 'Invalid id' })
+        return
+    }
+    try {
+        const {rows} = await pool.query(
+            `UPDATE parking_spots SET 
+            location = $1, 
+            start_time = $2,
+            end_time = $3,
+            price = $4 
+            WHERE id = $5
+            RETURNING *`,
+            [location,start_time,end_time,price,spotId]
+        )
+        if(rows.length === 0){
+            res.status(404).json({error: 'Spot not found'})
+            return
+        }
+        res.json(rows[0])
+    } catch (error) {
+        console.error('Error updating location', error);
+        res.status(500).json({ error: 'Server error' });
     }
 })
 export default router;
