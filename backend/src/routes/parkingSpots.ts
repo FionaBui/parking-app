@@ -14,4 +14,26 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 
+router.post('/', async(req:Request, res:Response)=>{
+    const {owner_id, location, start_time, end_time, price} = req.body
+
+    if(!owner_id || !location || !start_time || !end_time){
+        res.status(400).json({error: 'All fields are required.'})
+        return
+    }
+
+    try {
+        const {rows} = await pool.query(
+            `INSERT INTO parking_spots (owner_id, location, start_time, end_time, price) 
+            VALUES ($1,$2,$3,$4,$5)
+            RETURNING *`,
+            [owner_id, location, start_time, end_time, price || 0]
+        )
+        res.status(201).json(rows[0])
+    } catch (err) {
+        console.error('Error creating location', err);
+        res.status(500).json({ error: 'Server error when saving location' });
+    }
+})
+
 export default router;
