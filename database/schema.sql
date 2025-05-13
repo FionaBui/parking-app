@@ -23,10 +23,10 @@ CREATE TABLE parking_spots (
 CREATE TABLE rentals (
   id SERIAL PRIMARY KEY,
   spot_id INTEGER NOT NULL,
-  rental_id INTEGER NOT NULL,
+  renter_id INTEGER NOT NULL,
   rent_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (spot_id) REFERENCES parking_spots(id),
-  FOREIGN KEY (rental_id) REFERENCES users(id)
+  FOREIGN KEY (renter_id) REFERENCES users(id)
 );
 
 INSERT INTO users (name, email, apartment_info)
