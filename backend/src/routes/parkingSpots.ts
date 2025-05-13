@@ -85,8 +85,44 @@ router.put('/:id', async(req:Request, res:Response)=>{
         }
         res.json(rows[0])
     } catch (error) {
-        console.error('Error updating location', error);
+        console.error('Error updating spot', error);
         res.status(500).json({ error: 'Server error' });
     }
 })
+
+// DELETE Ta bort en plats
+router.delete('/:id', async(req:Request, res:Response)=>{
+    const spotId = parseInt(req.params.id,10)
+    if(isNaN(spotId)){
+        res.status(400).json({error: 'Invalid id' })
+        return
+    }
+    try {
+        // Kontrollera om några uthyrare använder den här platsen
+        const rentalCheck = await pool.query(
+            'SELECT * FROM rentals WHERE spot_id = $1',
+            [spotId]
+        );
+      
+        if (rentalCheck.rows.length > 0) {
+          res.status(400).json({ error: 'Parkeringsplatsen är bokad och kan inte raderas.' });
+          return
+        }
+
+        // Om ingen har bokat
+        const {rows} = await pool.query(
+            `DELETE FROM parking_spots 
+            WHERE id = $1 RETURNING *`,
+            [spotId]
+        )
+        if(rows.length === 0){
+            res.status(404).json({error: 'Spot not found'})
+            return
+        }
+        res.status(200).json({ message: 'Spot is deleted', spot: rows[0] });
+    } catch (error) {
+        console.error('Error deleting spot', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+}) 
 export default router;
