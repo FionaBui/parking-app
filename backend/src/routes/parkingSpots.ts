@@ -14,6 +14,7 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 
+// POST
 router.post('/', async(req:Request, res:Response)=>{
     const {owner_id, location, start_time, end_time, price} = req.body
 
@@ -36,4 +37,23 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 })
 
+router.get('/:id',async(req:Request,res:Response)=>{
+    const spotId = parseInt(req.params.id,10) 
+    if (!spotId){
+        res.status(400).json({error: 'Invalid id' })
+        return
+    }
+    try {
+        const {rows} = await pool.query(`
+            SELECT * FROM parking_spots WHERE id = $1`, [spotId])
+        if(rows.length === 0){
+            res.status(404).json({error: 'Spot not found'})
+            return
+        }
+        res.json(rows[0])
+    } catch (error) {
+        console.error('Error getting spot',error)
+        res.status(500).json({error: 'Server error'})
+    }
+})
 export default router;
