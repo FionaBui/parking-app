@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
-import { Pool } from 'pg'
+import { Client } from 'pg'
 
 dotenv.config()
-export const pool = new Pool({
+export const client = new Client({
     connectionString: process.env.PGURI
 })

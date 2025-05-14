@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { pool } from '../db';
+import { client } from '../db';
 
 const router = express.Router();
 
@@ -13,13 +13,13 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 
     try {
-        const {rows} = await pool.query(
+        const {rows} = await client.query(
             `INSERT INTO rentals (spot_id, renter_id) 
             VALUES ($1,$2)
             RETURNING *`,
             [spot_id, renter_id]
         )
-        await pool.query(
+        await client.query(
           `UPDATE parking_spots SET is_available = false WHERE id = $1`, [spot_id]
         )
         res.status(201).json(rows[0])

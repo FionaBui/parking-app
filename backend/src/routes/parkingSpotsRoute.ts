@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { pool } from '../db';
+import { client } from '../db';
 
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 // 🟡 Get all parking spots
 router.get('/', async (_req: Request, res: Response) => {
   try {
-    const {rows} = await pool.query('SELECT * FROM parking_spots');
+    const {rows} = await client.query('SELECT * FROM parking_spots');
     res.json(rows);
   } catch (err) {
     console.error('Error while fetching parking spots:', err);
@@ -25,7 +25,7 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 
     try {
-        const {rows} = await pool.query(
+        const {rows} = await client.query(
             `INSERT INTO parking_spots (owner_id, location, start_time, end_time, price) 
             VALUES ($1,$2,$3,$4,$5)
             RETURNING *`,
@@ -46,7 +46,7 @@ router.get('/:id',async(req:Request,res:Response)=>{
         return
     }
     try {
-        const {rows} = await pool.query(`
+        const {rows} = await client.query(`
             SELECT * FROM parking_spots WHERE id = $1`, [spotId])
         if(rows.length === 0){
             res.status(404).json({error: 'Spot not found'})
@@ -69,7 +69,7 @@ router.put('/:id', async(req:Request, res:Response)=>{
         return
     }
     try {
-        const {rows} = await pool.query(
+        const {rows} = await client.query(
             `UPDATE parking_spots SET 
             location = $1, 
             start_time = $2,
@@ -99,7 +99,7 @@ router.delete('/:id', async(req:Request, res:Response)=>{
     }
     try {
         // Kontrollera om några uthyrare använder den här platsen
-        const rentalCheck = await pool.query(
+        const rentalCheck = await client.query(
             'SELECT * FROM rentals WHERE spot_id = $1',
             [spotId]
         );
@@ -110,7 +110,7 @@ router.delete('/:id', async(req:Request, res:Response)=>{
         }
 
         // If no one has booked, proceed to delete
-        const {rows} = await pool.query(
+        const {rows} = await client.query(
             `DELETE FROM parking_spots 
             WHERE id = $1 RETURNING *`,
             [spotId]

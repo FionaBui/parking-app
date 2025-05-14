@@ -1,7 +1,7 @@
 // Importera de nödvändiga biblioteken
 import express from 'express';
 import dotenv from 'dotenv'
-import { pool } from './db';
+import { client } from './db';
 import parkingSpotsRoute from './routes/parkingSpotsRoute';
 import rentalRoute from './routes/rentalRoute';
 import usersRoute from './routes/usersRoute';
@@ -15,7 +15,7 @@ const PORT = 3001;
 app.use(express.json());
 
 // Anslut PostgreSQL för testning
-pool.connect()
+client.connect()
 .then(()=> console.log('Connected to PostgreSQL via pg'))
 .catch((err)=> console.error(err))
 
