@@ -2,8 +2,9 @@
 import express from 'express';
 import dotenv from 'dotenv'
 import { pool } from './db';
-import parkingSpotsRoutes from './routes/parkingSpots';
+import parkingSpotsRoute from './routes/parkingSpotsRoute';
 import rentalRoute from './routes/rentalRoute';
+import usersRoute from './routes/usersRoute';
 
 // Initiera Express-applikationen
 dotenv.config();
@@ -19,8 +20,9 @@ pool.connect()
 .catch((err)=> console.error(err))
 
 // 🟡 Alla rutter till /parking-spots hanteras i routerfilen
-app.use('/parking-spots', parkingSpotsRoutes);
+app.use('/parking-spots', parkingSpotsRoute);
 app.use('/rentals', rentalRoute );
+app.use('/users', usersRoute)
 
 app.listen(PORT, () => {
   console.log(`🚗 Server is running at http://localhost:${PORT}`);

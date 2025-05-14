@@ -4,7 +4,7 @@ import { pool } from '../db';
 
 const router = express.Router();
 
-// 🟡 Hämta alla parkeringsplatser
+// 🟡 Get all parking spots
 router.get('/', async (_req: Request, res: Response) => {
   try {
     const {rows} = await pool.query('SELECT * FROM parking_spots');
@@ -15,7 +15,7 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 
-// POST
+// POST add a spot
 router.post('/', async(req:Request, res:Response)=>{
     const {owner_id, location, start_time, end_time, price} = req.body
 
@@ -38,7 +38,7 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 })
 
-// GET hämta bokning 
+// GET boking spot 
 router.get('/:id',async(req:Request,res:Response)=>{
     const spotId = parseInt(req.params.id,10) 
     if (isNaN(spotId)){
@@ -59,7 +59,7 @@ router.get('/:id',async(req:Request,res:Response)=>{
     }
 })
 
-// PUT Uppdatera platsinformation
+// PUT Update spot information
 router.put('/:id', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id, 10)
     const {location, start_time, end_time, price} = req.body
@@ -90,7 +90,7 @@ router.put('/:id', async(req:Request, res:Response)=>{
     }
 })
 
-// DELETE Ta bort en plats
+// DELETE 
 router.delete('/:id', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id,10)
     if(isNaN(spotId)){
@@ -109,7 +109,7 @@ router.delete('/:id', async(req:Request, res:Response)=>{
           return
         }
 
-        // Om ingen har bokat
+        // If no one has booked, proceed to delete
         const {rows} = await pool.query(
             `DELETE FROM parking_spots 
             WHERE id = $1 RETURNING *`,
