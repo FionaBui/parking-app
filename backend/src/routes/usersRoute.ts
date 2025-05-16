@@ -1,8 +1,28 @@
 import express, { Request, Response } from 'express';
 import { client } from '../db';
+import { error } from 'console';
 
 
 const router = express.Router();
+
+router.post('/', async(req:Request,res:Response)=>{
+    const {name, email, apartment_info } = req.body
+
+    if(!name || !email || !apartment_info){
+        res.status(400).json({error: 'Missing required fields'})
+        return
+    }
+    
+    try {
+        const {rows } = await client.query(
+            `INSERT INTO users (name , email, apartment_info) VALUES ($1,$2,$3)`,[name, email,apartment_info]
+        )
+        res.status(201).json(rows[0])
+    } catch (error) {
+        console.error('Error creating user:', error)
+        res.status(500).json({error: 'Server error'})
+    }
+})
 
 router.get('/:id', async(req:Request, res:Response)=>{
     const userId = parseInt(req.params.id,10)
@@ -30,5 +50,7 @@ router.get('/:id', async(req:Request, res:Response)=>{
         res.status(500).json({error:'Server error'})
     }
 })
+
+
 
 export default router;
