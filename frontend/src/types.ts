@@ -19,7 +19,10 @@ export type Spot = {
   export type SpotStatus = {
     spot_id : string;
     is_rented: boolean;
-    is_registered: boolean
+    is_registered: boolean;
+    start_time?: string;  
+    end_time?: string;
+    price?: number;
   }
   
  

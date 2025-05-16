@@ -10,12 +10,8 @@ function DateSelector({ onSelect, selectedDate }: Props) {
     return date;
   });
   console.log(days);
-  const formatDate = (date: Date) =>
-    date.toLocaleDateString("sv-SV", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
   const formatLabel = (date: Date) =>
     date.toLocaleDateString("us-US", {
       weekday: "short",
@@ -24,12 +20,20 @@ function DateSelector({ onSelect, selectedDate }: Props) {
     });
 
   return (
-    <div className="flex gap-2 mb-6 overflow-x-auto">
+    <div className="d-flex gap-2 mb-4 overflow-auto">
       {days.map((date) => {
         const value = formatDate(date);
         const label = formatLabel(date);
+        const isSelected = selectedDate === value;
+
         return (
-          <button key={value} onClick={() => onSelect(selectedDate)}>
+          <button
+            key={value}
+            className={`btn ${
+              isSelected ? "btn-primary" : "btn-outline-secondary"
+            }`}
+            onClick={() => onSelect(selectedDate)}
+          >
             {label}
           </button>
         );

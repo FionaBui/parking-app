@@ -3,12 +3,12 @@ import type { SpotStatus } from "../types";
 type Props = {
   spotStatus: SpotStatus[];
   onSelect: (spotId: string) => void;
-  selectedSpot: string | null;
+  selectedSpotId: string | null;
 };
 
 const levels = ["A", "B"];
 
-function ParkingMap({ spotStatus, selectedSpot, onSelect }: Props) {
+function ParkingMap({ spotStatus, selectedSpotId, onSelect }: Props) {
   return (
     <>
       <div className="d-flex flex-column gap-4">
@@ -21,7 +21,7 @@ function ParkingMap({ spotStatus, selectedSpot, onSelect }: Props) {
                 const spot = spotStatus.find((s) => s.spot_id === spotId);
                 const isRented = spot?.is_rented;
                 const isRegistered = spot?.is_registered;
-                const isSelected = selectedSpot === spotId;
+                const isSelected = selectedSpotId === spotId;
                 let btnClass = "btn btn-secondary";
                 if (isRented) btnClass = "btn btn-danger";
                 else if (isRegistered)

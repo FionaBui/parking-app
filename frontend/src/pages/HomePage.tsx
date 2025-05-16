@@ -10,16 +10,18 @@ const HomePage = () => {
     return today.toISOString().split("T")[0];
   });
 
-  const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
-  const [allSpotStatus, setAllSpotStatus] = useState<SpotStatus[]>([]);
+  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
+  const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
 
   useEffect(() => {
     if (selectedDate) {
       fetch(`http://localhost:3001/parking-spots?date=${selectedDate}`)
         .then((res) => res.json())
-        .then((data) => setAllSpotStatus(data));
+        .then((data) => setAllSpots(data));
     }
   }, [selectedDate]);
+
+  const selectedSpotDetail = allSpots.find((s) => s.spot_id === selectedSpotId);
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,13 +29,19 @@ const HomePage = () => {
         selectedDate={selectedDate}
         onSelect={(date) => setSelectedDate(date)}
       />
-      <div className="flex gap-6">
-        <ParkingMap
-          spotStatus={allSpotStatus}
-          selectedSpot={selectedSpot}
-          onSelect={(spotId) => setSelectedSpot(spotId)}
-        />
-        <SpotDetails />
+      <div className="d-flex gap-4 mt-4">
+        <div className="flex-grow-1">
+          <ParkingMap
+            spotStatus={allSpots}
+            selectedSpotId={selectedSpotId}
+            onSelect={(spotId) => setSelectedSpotId(spotId)}
+          />
+        </div>
+        {selectedSpotDetail && (
+          <div style={{ minWidth: "280px" }}>
+            <SpotDetails selectedSpot={selectedSpotDetail} />
+          </div>
+        )}
       </div>
     </div>
   );
