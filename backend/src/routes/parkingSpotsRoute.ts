@@ -4,14 +4,33 @@ import { client } from '../db';
 
 const router = express.Router();
 
-// 🟡 Get all parking spots
-router.get('/', async (_req: Request, res: Response) => {
+// Hämta alla parkeringsplatser
+router.get('/', async (req: Request, res: Response) => {
+  const date = req.query.date as string
   try {
-    const {rows} = await client.query('SELECT * FROM parking_spots');
-    res.json(rows);
-  } catch (err) {
-    console.error('Error while fetching parking spots:', err);
-    res.status(500).json({ error: 'Something went wrong.' });
+    // 1. Hämta alla 50 platser från tabellen parking_spots
+    const { rows: allSpots } = await client.query(
+        'SELECT id, location, owner_id FROM parking_spots'
+      );
+    // 2. Om det finns ett datum → kontrollera vilken plats som är uthyrd den dagen
+    let rentedSpotId = []
+    if(date){
+        const {rows:rented} = await client.query(
+            'SELECT spot_id FROM rentals WHERE DATE(rent_time) = $1', [date]
+        )
+        rentedSpotId = rented.map(r=>r.spot_id)
+    }
+
+    // 3.kombinera för att generera data för att återgå till frontend
+    const result = allSpots.map(spot=> ({
+        spot_id : spot.location,
+        is_registered : spot.owner_id !== null ,
+        is_rented : rentedSpotId.includes(spot.id)
+    }))
+
+    res.json(result)
+  } catch (error) {
+    
   }
 });
 
