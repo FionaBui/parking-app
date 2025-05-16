@@ -1,11 +1,10 @@
-import React from "react";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link, Outlet } from "react-router-dom";
 
 const Layout = () => {
   return (
     <>
-      <Navbar bg="warning" expand="lg" className="mb-4">
+      <Navbar bg="primary" expand="lg" className="mb-4">
         <Container>
           <Navbar.Brand as={Link} to="/">
             🚗 ParkingApp
