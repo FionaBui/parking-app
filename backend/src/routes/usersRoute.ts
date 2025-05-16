@@ -5,7 +5,7 @@ import { error } from 'console';
 
 const router = express.Router();
 
-router.post('/', async(req:Request,res:Response)=>{
+router.post('/register', async(req:Request,res:Response)=>{
     const {name, email, apartment_info } = req.body
 
     if(!name || !email || !apartment_info){
@@ -20,6 +20,28 @@ router.post('/', async(req:Request,res:Response)=>{
         res.status(201).json(rows[0])
     } catch (error) {
         console.error('Error creating user:', error)
+        res.status(500).json({error: 'Server error'})
+    }
+})
+
+router.post('/login', async(req:Request,res:Response)=>{
+    const {email} = req.body
+
+    if(!email) {
+        res.status(400).json({error: 'Email is required'});
+        return
+    }
+    try {
+        const {rows} = await client.query(
+            `SELECT * FROM users WHERE email = $1`, [email]
+        )
+        if(rows.length === 0){
+            res.status(401).json({error: 'Invalid email'})
+            return
+        }
+        res.status(200).json(rows[0])
+    } catch (error) {
+        console.error('Error during login', error)
         res.status(500).json({error: 'Server error'})
     }
 })
