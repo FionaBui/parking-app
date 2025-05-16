@@ -17,7 +17,7 @@ function ParkingMap({ spotStatus, selectedSpot, onSelect }: Props) {
             <h3>Våning {level}</h3>
             <div>
               {Array.from({ length: 25 }, (_, i) => {
-                const spotId = `${level} - ${i + 1}`;
+                const spotId = `${level}-${i + 1}`;
                 const spot = spotStatus.find((s) => s.spot_id === spotId);
                 const isRented = spot?.is_rented;
                 const isRegistered = spot?.is_registered;
@@ -29,7 +29,7 @@ function ParkingMap({ spotStatus, selectedSpot, onSelect }: Props) {
                 return (
                   <button
                     key={spotId}
-                    className={`p-4 rounded font-bold text-white ${color}`}
+                    className={`p-4 rounded font-bold ${color}`}
                     onClick={() => onSelect(spotId)}
                     disabled={!isRegistered || isRented}
                   >
