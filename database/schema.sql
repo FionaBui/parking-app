@@ -31,14 +31,10 @@ CREATE TABLE rentals (
 -- users
 INSERT INTO users (name, email, apartment_info)
 VALUES 
-  ('Fiona', 'fiona@example.com', 'lgh 1303'),
-  ('Alice', 'alice@example.com', 'lgh 1002');
-  ('Bob', 'bob@example.com', 'lgh 1402')
-
--- rentals
-INSERT INTO rentals (spot_id, renter_id, rent_time)
-VALUES 
-  (1, 3, '2025-05-21 10:00:00');  -- Bob thuê A-1
+  ('Fiona', 'fiona@example.com', '1303'),
+  ('Alice', 'alice@example.com', '1002'),
+  ('Bob', 'bob@example.com', '1402'),
+  ('Anna', 'anna@example.com', '1104');
 
 
 -- 🅿️ Create 50 fixed parking spaces (A-1 → A-25, B-1 → B-25)
@@ -56,4 +52,10 @@ INSERT INTO parking_spots (location) VALUES
 ('B-21'), ('B-22'), ('B-23'), ('B-24'), ('B-25');
 
 UPDATE parking_spots SET owner_id = 1, start_time = '2025-05-21 08:00', end_time = '2025-05-21 18:00', price = 25 WHERE location = 'A-1';
-UPDATE parking_spots SET owner_id = 2, start_time = '2025-05-21 09:00', end_time = '2025-05-21 17:00', price = 20 WHERE location = 'B-3';
+UPDATE parking_spots SET owner_id = 2, start_time = '2025-05-21 09:00', end_time = '2025-05-21 17:00', price = 20 WHERE location = 'B-1';
+
+-- rentals
+INSERT INTO rentals (spot_id, renter_id, rent_time)
+VALUES 
+  (1, 3, '2025-05-21 10:00:00');  -- Bob rent A-1
+

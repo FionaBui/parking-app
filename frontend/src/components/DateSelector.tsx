@@ -32,7 +32,7 @@ function DateSelector({ onSelect, selectedDate }: Props) {
             className={`btn ${
               isSelected ? "btn-primary" : "btn-outline-secondary"
             }`}
-            onClick={() => onSelect(selectedDate)}
+            onClick={() => onSelect(value)}
           >
             {label}
           </button>
