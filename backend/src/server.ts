@@ -1,8 +1,6 @@
 // Importera de nödvändiga biblioteken
 import express from 'express';
 import cors from 'cors'
-
-
 import dotenv from 'dotenv'
 import { client } from './db';
 import parkingSpotsRoute from './routes/parkingSpotsRoute';

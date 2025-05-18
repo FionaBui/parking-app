@@ -33,6 +33,13 @@ INSERT INTO users (name, email, apartment_info)
 VALUES 
   ('Fiona', 'fiona@example.com', 'lgh 1303'),
   ('Alice', 'alice@example.com', 'lgh 1002');
+  ('Bob', 'bob@example.com', 'lgh 1402')
+
+-- rentals
+INSERT INTO rentals (spot_id, renter_id, rent_time)
+VALUES 
+  (1, 3, '2025-05-21 10:00:00');  -- Bob thuê A-1
+
 
 -- 🅿️ Create 50 fixed parking spaces (A-1 → A-25, B-1 → B-25)
 INSERT INTO parking_spots (location) VALUES
@@ -47,3 +54,6 @@ INSERT INTO parking_spots (location) VALUES
 ('B-11'), ('B-12'), ('B-13'), ('B-14'), ('B-15'),
 ('B-16'), ('B-17'), ('B-18'), ('B-19'), ('B-20'),
 ('B-21'), ('B-22'), ('B-23'), ('B-24'), ('B-25');
+
+UPDATE parking_spots SET owner_id = 1, start_time = '2025-05-21 08:00', end_time = '2025-05-21 18:00', price = 25 WHERE location = 'A-1';
+UPDATE parking_spots SET owner_id = 2, start_time = '2025-05-21 09:00', end_time = '2025-05-21 17:00', price = 20 WHERE location = 'B-3';

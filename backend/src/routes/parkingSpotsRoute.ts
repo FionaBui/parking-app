@@ -6,31 +6,39 @@ const router = express.Router();
 
 // Hämta alla parkeringsplatser
 router.get('/', async (req: Request, res: Response) => {
-  const date = req.query.date as string
+  const date = req.query.date as string;
+
+  if (!date) {
+   res.status(400).json({ error: 'Missing date (yyyy-mm-dd)' });
+   return 
+  }
+
   try {
     // 1. Hämta alla 50 platser från tabellen parking_spots
     const { rows: allSpots } = await client.query(
-        'SELECT id, location, owner_id FROM parking_spots'
+        'SELECT id, location, owner_id, start_time, end_time, price FROM parking_spots'
       );
-    // 2. Om det finns ett datum → kontrollera vilken plats som är uthyrd den dagen
-    let rentedSpotId = []
-    if(date){
-        const {rows:rented} = await client.query(
-            'SELECT spot_id FROM rentals WHERE DATE(rent_time) = $1', [date]
-        )
-        rentedSpotId = rented.map(r=>r.spot_id)
-    }
+    // 2. Kolla vilka platser är bokade det datumet
+    const { rows: rented } = await client.query(
+        'SELECT spot_id FROM rentals WHERE DATE(rent_time) = $1',
+        [date]
+      );
+      const rentedSpotId = rented.map((r) => r.spot_id);
 
     // 3.kombinera för att generera data för att återgå till frontend
     const result = allSpots.map(spot=> ({
-        spot_id : spot.location,
-        is_registered : spot.owner_id !== null ,
-        is_rented : rentedSpotId.includes(spot.id)
+      spot_id: spot.location,
+      is_registered: spot.owner_id !== null,
+      is_rented: rentedSpotId.includes(spot.id),
+      start_time: spot.start_time,
+      end_time: spot.end_time,
+      price: spot.price,
     }))
 
     res.json(result)
   } catch (error) {
-    
+    console.error("Error loading parking spots:", error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
