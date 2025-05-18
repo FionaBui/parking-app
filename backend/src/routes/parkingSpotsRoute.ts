@@ -26,14 +26,27 @@ router.get('/', async (req: Request, res: Response) => {
       const rentedSpotId = rented.map((r) => r.spot_id);
 
     // 3.kombinera för att generera data för att återgå till frontend
-    const result = allSpots.map(spot=> ({
-      spot_id: spot.location,
-      is_registered: spot.owner_id !== null,
-      is_rented: rentedSpotId.includes(spot.id),
-      start_time: spot.start_time,
-      end_time: spot.end_time,
-      price: spot.price,
-    }))
+    const result = allSpots.map((spot) => {
+      const is_registered = spot.owner_id !== null;
+      const is_rented = rentedSpotId.includes(spot.id);
+      
+      // Om det finns en ägare + tid kan den hyras → annars är standardinställningen "upptagen"
+      const is_available =
+        is_registered &&
+        spot.start_time !== null &&
+        spot.end_time !== null &&
+        !is_rented;
+    
+      return {
+        spot_id: spot.location,
+        is_registered,
+        is_rented,
+        is_available,
+        start_time: spot.start_time,
+        end_time: spot.end_time,
+        price: spot.price,
+      };
+    });
 
     res.json(result)
   } catch (error) {

@@ -39,7 +39,17 @@ const HomePage = () => {
         </div>
         {selectedSpotDetail && (
           <div style={{ minWidth: "280px" }}>
-            <SpotDetails selectedSpot={selectedSpotDetail} />
+            <SpotDetails
+              selectedSpot={selectedSpotDetail}
+              selectedDate={selectedDate}
+              onBooked={() => {
+                fetch(
+                  `http://localhost:3001/parking-spots?date=${selectedDate}`
+                )
+                  .then((res) => res.json())
+                  .then((data) => setAllSpots(data));
+              }}
+            />
           </div>
         )}
       </div>

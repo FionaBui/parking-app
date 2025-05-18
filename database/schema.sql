@@ -53,6 +53,7 @@ INSERT INTO parking_spots (location) VALUES
 
 UPDATE parking_spots SET owner_id = 1, start_time = '2025-05-21 08:00', end_time = '2025-05-21 18:00', price = 25 WHERE location = 'A-1';
 UPDATE parking_spots SET owner_id = 2, start_time = '2025-05-21 09:00', end_time = '2025-05-21 17:00', price = 20 WHERE location = 'B-1';
+UPDATE parking_spots SET owner_id = 3 WHERE location = 'B-2';
 
 -- rentals
 INSERT INTO rentals (spot_id, renter_id, rent_time)
