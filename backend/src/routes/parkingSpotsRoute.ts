@@ -31,15 +31,16 @@ router.get('/', async (req: Request, res: Response) => {
     const result = allSpots.map((spot) => {
       const rentalSpot = rented.find(s => s.spot_id === spot.id)
       return {
-        spot_id: spot.location,
+        spot_id: spot.id,                        
+        spot_number: spot.location,              
         is_registered: spot.owner_id !== null,
         is_available: !!(spot.owner_id && spot.start_time && spot.end_time),
         is_rented: Boolean(rentalSpot),
-        renter_id : rentalSpot? rentalSpot.renter_id : null,
+        renter_id: rentalSpot ? rentalSpot.renter_id : null,
         is_owner: spot.owner_id === userId,
         start_time: spot.start_time,
         end_time: spot.end_time,
-        price: spot.price
+        price: spot.price,
       }
     });
 

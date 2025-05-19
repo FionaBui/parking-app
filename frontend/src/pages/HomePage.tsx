@@ -5,15 +5,15 @@ import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 
 const HomePage = () => {
-  const currentUserId = 2;
+  const currentUserId = 3;
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   });
 
-  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
+  const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
   const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
-
+  // Hämta listan igen när nytt datum väljs
   useEffect(() => {
     if (selectedDate) {
       fetch(

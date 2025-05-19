@@ -14,20 +14,17 @@ function SpotDetails({
   onBooked,
   currentUserId,
 }: Props) {
-  if (!selectedSpot) return null;
-
-  const isMine =
-    selectedSpot.renter_id && selectedSpot.renter_id === currentUserId;
-
-  const isOwner = selectedSpot.is_owner;
-
   const [startTime, setStartTime] = useState(
     selectedSpot.start_time?.slice(11, 16) || "00:00"
   );
   const [endTime, setEndTime] = useState(
     selectedSpot.end_time?.slice(11, 16) || "23:00"
   );
-  const [price, setPrice] = useState(selectedSpot.price || 0);
+  const [price, setPrice] = useState<number>(selectedSpot.price || 0);
+
+  if (!selectedSpot) return null;
+
+  const isMineSpot = selectedSpot.renter_id === currentUserId;
 
   const handleUpdateSpot = async () => {
     if (startTime >= endTime) {
@@ -93,7 +90,7 @@ function SpotDetails({
     buttonText = "Not registered";
     isDisabled = true;
   } else if (selectedSpot.is_rented) {
-    if (isMine) {
+    if (isMineSpot) {
       buttonText = "Cancel booking";
       isDisabled = false;
       onClick = handleCancelBooking;
@@ -107,7 +104,7 @@ function SpotDetails({
   }
 
   const statusText = selectedSpot.is_rented
-    ? isMine
+    ? isMineSpot
       ? "You booked this spot"
       : "Booked"
     : selectedSpot.is_available
@@ -123,13 +120,13 @@ function SpotDetails({
         {selectedSpot.is_owner ? (
           <>
             <p>
-              <strong>Your spot:</strong> {selectedSpot.spot_id}
+              <strong>Your spot:</strong> {selectedSpot.spot_number}
             </p>
             <div className="mb-2">
               <label className="form-label">Start Time</label>
               <input
                 type="time"
-                className="form-comtrol"
+                className="form-control"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
               />
@@ -138,7 +135,7 @@ function SpotDetails({
               <label className="form-label">End Time</label>
               <input
                 type="time"
-                className="form-comtrol"
+                className="form-control"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
               />
@@ -147,7 +144,7 @@ function SpotDetails({
               <label className="form-label">Price</label>
               <input
                 type="number"
-                className="form-comtrol"
+                className="form-control"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
               />
@@ -161,7 +158,7 @@ function SpotDetails({
         ) : (
           <div>
             <p>
-              <strong>Spot:</strong> {selectedSpot.spot_id}
+              <strong>Spot:</strong> {selectedSpot.spot_number}
             </p>
             <p>
               <strong>Status</strong> {statusText}
