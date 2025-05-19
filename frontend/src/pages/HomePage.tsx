@@ -5,6 +5,7 @@ import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 
 const HomePage = () => {
+  const currentUserId = 3;
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -15,7 +16,9 @@ const HomePage = () => {
 
   useEffect(() => {
     if (selectedDate) {
-      fetch(`http://localhost:3001/parking-spots?date=${selectedDate}`)
+      fetch(
+        `http://localhost:3001/parking-spots?date=${selectedDate}&user=${currentUserId}`
+      )
         .then((res) => res.json())
         .then((data) => setAllSpots(data));
     }
@@ -44,11 +47,12 @@ const HomePage = () => {
               selectedDate={selectedDate}
               onBooked={() => {
                 fetch(
-                  `http://localhost:3001/parking-spots?date=${selectedDate}`
+                  `http://localhost:3001/parking-spots?date=${selectedDate}&user=${currentUserId}`
                 )
                   .then((res) => res.json())
                   .then((data) => setAllSpots(data));
               }}
+              currentUserId={currentUserId}
             />
           </div>
         )}

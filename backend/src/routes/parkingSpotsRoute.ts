@@ -7,9 +7,11 @@ const router = express.Router();
 // Hämta alla parkeringsplatser
 router.get('/', async (req: Request, res: Response) => {
   const date = req.query.date as string;
+  const userId = parseInt(req.query.user as string , 10)
 
-  if (!date) {
-   res.status(400).json({ error: 'Missing date (yyyy-mm-dd)' });
+
+  if (!date || isNaN(userId)) {
+   res.status(400).json({ error: 'Missing date or user ID' });
    return 
   }
 
@@ -20,32 +22,25 @@ router.get('/', async (req: Request, res: Response) => {
       );
     // 2. Kolla vilka platser är bokade det datumet
     const { rows: rented } = await client.query(
-        'SELECT spot_id FROM rentals WHERE DATE(rent_time) = $1',
+        'SELECT spot_id, renter_id FROM rentals WHERE DATE(rent_time) = DATE($1)',
         [date]
       );
-      const rentedSpotId = rented.map((r) => r.spot_id);
+    // const rentedSpotId = rented.map((r) => r.spot_id);
 
     // 3.kombinera för att generera data för att återgå till frontend
     const result = allSpots.map((spot) => {
-      const is_registered = spot.owner_id !== null;
-      const is_rented = rentedSpotId.includes(spot.id);
-      
-      // Om det finns en ägare + tid kan den hyras → annars är standardinställningen "upptagen"
-      const is_available =
-        is_registered &&
-        spot.start_time !== null &&
-        spot.end_time !== null &&
-        !is_rented;
-    
+      const rentalSpot = rented.find(s => s.spot_id === spot.id)
       return {
         spot_id: spot.location,
-        is_registered,
-        is_rented,
-        is_available,
+        is_registered: spot.owner_id !== null,
+        is_available: !!(spot.owner_id && spot.start_time && spot.end_time),
+        is_rented: Boolean(rentalSpot),
+        renter_id : rentalSpot? rentalSpot.renter_id : null,
+        is_owner: spot.owner_id === userId,
         start_time: spot.start_time,
         end_time: spot.end_time,
-        price: spot.price,
-      };
+        price: spot.price
+      }
     });
 
     res.json(result)

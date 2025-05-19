@@ -4,10 +4,19 @@ type Props = {
   selectedSpot: SpotStatus;
   selectedDate: string;
   onBooked: () => void;
+  currentUserId: number;
 };
 
-function SpotDetails({ selectedSpot, selectedDate, onBooked }: Props) {
+function SpotDetails({
+  selectedSpot,
+  selectedDate,
+  onBooked,
+  currentUserId,
+}: Props) {
   if (!selectedSpot) return null;
+
+  const isMine =
+    selectedSpot.renter_id && selectedSpot.renter_id === currentUserId;
 
   const handleBooking = async () => {
     const res = await fetch("http://localhost:3001/rentals", {
@@ -17,7 +26,7 @@ function SpotDetails({ selectedSpot, selectedDate, onBooked }: Props) {
       },
       body: JSON.stringify({
         spot_id: selectedSpot.spot_id,
-        renter_id: 3,
+        renter_id: currentUserId,
         rent_date: selectedDate,
       }),
     });
@@ -27,8 +36,45 @@ function SpotDetails({ selectedSpot, selectedDate, onBooked }: Props) {
     }
   };
 
+  const handleCancelBooking = async () => {
+    const res = await fetch(
+      `http://localhost:3001/rentals/cancel?spot=${selectedSpot.spot_id}&user=${currentUserId}&date=${selectedDate}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (res.ok) {
+      alert("Booking cancelled");
+      onBooked();
+    }
+  };
+
+  // Button
+  let buttonText = "Book now";
+  let isDisabled = false;
+  let onClick = handleBooking;
+
+  if (!selectedSpot.is_registered) {
+    buttonText = "Not registered";
+    isDisabled = true;
+  } else if (selectedSpot.is_rented) {
+    if (isMine) {
+      buttonText = "Cancel booking";
+      isDisabled = false;
+      onClick = handleCancelBooking;
+    } else {
+      buttonText = "Already booked";
+      isDisabled = true;
+    }
+  } else if (!selectedSpot.is_available) {
+    buttonText = "Busy";
+    isDisabled = true;
+  }
+
   const statusText = selectedSpot.is_rented
-    ? "Booked"
+    ? isMine
+      ? "You booked this spot"
+      : "Booked"
     : selectedSpot.is_available
     ? "Available"
     : selectedSpot.is_registered
@@ -61,18 +107,10 @@ function SpotDetails({ selectedSpot, selectedDate, onBooked }: Props) {
         )}
         <button
           className="btn btn-primary w-100 mt-2"
-          disabled={
-            !selectedSpot.is_registered ||
-            selectedSpot.is_rented ||
-            !selectedSpot.is_available
-          }
-          onClick={handleBooking}
+          disabled={isDisabled}
+          onClick={onClick}
         >
-          {!selectedSpot.is_registered ||
-          selectedSpot.is_rented ||
-          !selectedSpot.is_available
-            ? "Not available for booking."
-            : "Book now"}
+          {buttonText}
         </button>
       </div>
     </>
