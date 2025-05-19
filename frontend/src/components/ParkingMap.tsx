@@ -24,16 +24,15 @@ function ParkingMap({ spotStatus, selectedSpotId, onSelect }: Props) {
                 let btnClass = "btn btn-secondary";
                 if (spot?.is_rented) {
                   btnClass = "btn btn-danger";
+                } else if (spot?.is_owner) {
+                  btnClass = "btn btn-primary";
+                } else if (spot?.is_available) {
+                  btnClass = isSelected ? "btn btn-primary" : "btn btn-success";
                 } else if (spot?.is_registered) {
-                  if (spot.is_available) {
-                    btnClass = isSelected
-                      ? "btn btn-primary"
-                      : "btn btn-success";
-                  } else {
-                    btnClass = "btn btn-danger";
-                  }
+                  btnClass = "btn btn-danger";
                 }
 
+                //  Vi gör så att platsen är röd även om den inte är uthyrd, men ägs av någon annan och inte är redo att hyras ut. Detta gör det tydligt för användaren att någon annan redan har registrerat platsen.
                 return (
                   <div className="col" key={spotId}>
                     <button
