@@ -9,7 +9,6 @@ router.get('/', async (req: Request, res: Response) => {
   const date = req.query.date as string;
   const userId = parseInt(req.query.user as string , 10)
 
-
   if (!date || isNaN(userId)) {
    res.status(400).json({ error: 'Missing date or user ID' });
    return 
@@ -18,29 +17,32 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     // 1. Hämta alla 50 platser från tabellen parking_spots
     const { rows: allSpots } = await client.query(
-        'SELECT id, location, owner_id, start_time, end_time, price FROM parking_spots'
+        'SELECT id AS spot_id, location, owner_id FROM parking_spots ORDER BY id'
       );
-    // 2. Kolla vilka platser är bokade det datumet
+    // 2. Spot har daglig uthyrningsregistrering
+    const {rows: available } = await client.query(`SELECT * FROM available_spot WHERE date = $1`, [date])
+
+    // 3. Kolla vilka platser är bokade det datumet
     const { rows: rented } = await client.query(
-        'SELECT spot_id, renter_id FROM rentals WHERE DATE(rent_time) = DATE($1)',
+        'SELECT spot_id, renter_id FROM rentals WHERE rent_date = $1',
         [date]
       );
-    // const rentedSpotId = rented.map((r) => r.spot_id);
 
     // 3.kombinera för att generera data för att återgå till frontend
     const result = allSpots.map((spot) => {
-      const rentalSpot = rented.find(s => s.spot_id === spot.id)
+        const availableSpot = available.find(a=>a.spot_id === spot.spot_id)
+      const rentalSpot = rented.find(r => r.spot_id === spot.spot_id)
       return {
-        spot_id: spot.id,                        
+        spot_id: spot.spot_id,                        
         spot_number: spot.location,              
         is_registered: spot.owner_id !== null,
-        is_available: !!(spot.owner_id && spot.start_time && spot.end_time),
-        is_rented: Boolean(rentalSpot),
-        renter_id: rentalSpot ? rentalSpot.renter_id : null,
+        is_available: !!availableSpot,
+        is_rented: !!rentalSpot,
+        renter_id: rentalSpot?.renter_id || null,
         is_owner: spot.owner_id === userId,
-        start_time: spot.start_time,
-        end_time: spot.end_time,
-        price: spot.price,
+        start_time: availableSpot?.start_time || null,
+        end_time: availableSpot?.end_time || null,
+        price: availableSpot?.price || 0,
       }
     });
 
@@ -51,75 +53,55 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// POST add a spot
-router.post('/', async(req:Request, res:Response)=>{
-    const {owner_id, location, start_time, end_time, price} = req.body
-
-    if(!owner_id || !location || !start_time || !end_time){
-        res.status(400).json({error: 'All fields are required.'})
-        return
-    }
-
-    try {
-        const {rows} = await client.query(
-            `INSERT INTO parking_spots (owner_id, location, start_time, end_time, price) 
-            VALUES ($1,$2,$3,$4,$5)
-            RETURNING *`,
-            [owner_id, location, start_time, end_time, price || 0]
-        )
-        res.status(201).json(rows[0])
-    } catch (err) {
-        console.error('Error creating location', err);
-        res.status(500).json({ error: 'Server error when saving location' });
-    }
-})
-
-// GET boking spot 
-router.get('/:id',async(req:Request,res:Response)=>{
-    const spotId = parseInt(req.params.id,10) 
-    if (isNaN(spotId)){
-        res.status(400).json({error: 'Invalid id' })
-        return
-    }
-    try {
-        const {rows} = await client.query(`
-            SELECT * FROM parking_spots WHERE id = $1`, [spotId])
-        if(rows.length === 0){
-            res.status(404).json({error: 'Spot not found'})
-            return
-        }
-        res.json(rows[0])
-    } catch (error) {
-        console.error('Error getting spot',error)
-        res.status(500).json({error: 'Server error'})
-    }
-})
-
 // PUT Update spot information
 router.put('/:id', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id, 10)
-    const {location, start_time, end_time, price} = req.body
+    const {user_id, date, start_time, end_time, price} = req.body
 
     if(isNaN(spotId)){
-        res.status(400).json({error: 'Invalid id' })
+        res.status(400).json({error: 'Invalid spot id' })
         return
     }
+    if (!start_time || !end_time || price === undefined || !user_id) {
+        res.status(400).json({ error: 'Missing required fields' });
+        return
+      }
     try {
-        const {rows} = await client.query(
-            `UPDATE parking_spots SET 
-            location = $1, 
-            start_time = $2,
-            end_time = $3,
-            price = $4 
-            WHERE id = $5
-            RETURNING *`,
-            [location,start_time,end_time,price,spotId]
+      // Kontrollera om användaren är platsägaren
+      const {rows : checkOwner} = await client.query(
+        `SELECT * FROM parking_spots 
+        WHERE id = $1 AND owner_id = $2`,
+        [spotId, user_id]
+      )
+      if (checkOwner.length === 0){
+        res.status(403).json({error: 'Not the owner of this spot'})
+        return
+      }
+      // Om en post för den dagen redan finns → uppdatera
+      const {rows:exists} = await client.query(
+        `SELECT * FROM available_spot WHERE spot_id = $1 AND date = $2`, [spotId, date]
+      )
+
+      if (exists.length > 0){
+        const {rows : updated} = await client.query(
+        `UPDATE available_spot 
+        SET start_time = $1, end_time = $2, price = $3
+        WHERE spot_id = $4 AND date = $5
+        RETURNING *`,
+        [start_time, end_time,price, spotId,date]
         )
-        if(rows.length === 0){
-            res.status(404).json({error: 'Spot not found'})
-            return
-        }
-        res.json(rows[0])
+        res.json({spot:updated[0]})
+      }
+
+      // Om inte redan → INSERT nytt
+      const {rows: inserted} = await client.query(
+        `INSERT INTO available_spot (spot_id, date, start_time, end_time, price)
+        VALUES ($1,$2,$3,$4,$5)
+        RETURNING *`,
+        [spotId, date, start_time, end_time, price]
+      )
+      res.status(201).json({spot: inserted[0]})
+
     } catch (error) {
         console.error('Error updating spot', error);
         res.status(500).json({ error: 'Server error' });
@@ -127,38 +109,71 @@ router.put('/:id', async(req:Request, res:Response)=>{
 })
 
 // DELETE 
-router.delete('/:id', async(req:Request, res:Response)=>{
+router.delete('/:id/availability', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id,10)
-    if(isNaN(spotId)){
+    const date = req.query.date as string
+    const userId = parseInt(req.query.user as string, 10)
+    if(isNaN(spotId) || !date || isNaN(userId)){
         res.status(400).json({error: 'Invalid id' })
         return
     }
     try {
-        // Kontrollera om några uthyrare använder den här platsen
-        const rentalCheck = await client.query(
-            'SELECT * FROM rentals WHERE spot_id = $1',
-            [spotId]
+      // Kontrollera ägarskap
+      const {rows : checkOwner} = await client.query(
+        `SELECT * FROM parking_spots 
+        WHERE id = $1 AND owner_id = $2`,
+        [spotId, userId]
+      )
+      if (checkOwner.length === 0){
+        res.status(403).json({error: 'Not the owner of this spot'})
+        return
+      }
+      // Kontrollera om några uthyrare använder den här platsen
+      const {rows:rentalCheck} = await client.query(
+        'SELECT * FROM rentals WHERE spot_id = $1 AND rent_date = $2',
+        [spotId, date]
         );
-      
-        if (rentalCheck.rows.length > 0) {
-          res.status(400).json({ error: 'Parkeringsplatsen är bokad och kan inte raderas.' });
+        if (rentalCheck.length > 0) {
+          res.status(400).json({ error: 'This spot is already rented today and cannot be cancelled' });
           return
         }
 
         // If no one has booked, proceed to delete
-        const {rows} = await client.query(
-            `DELETE FROM parking_spots 
-            WHERE id = $1 RETURNING *`,
-            [spotId]
+        const {rows: deleted} = await client.query(
+            `DELETE FROM available_spot 
+            WHERE spot_id = $1 AND date = $2 RETURNING *`,
+            [spotId, date]
         )
-        if(rows.length === 0){
+        if(deleted.length === 0){
             res.status(404).json({error: 'Spot not found'})
             return
         }
-        res.status(200).json({ message: 'Spot is deleted', spot: rows[0] });
+        res.status(200).json({spot: deleted[0] });
     } catch (error) {
         console.error('Error deleting spot', error);
         res.status(500).json({ error: 'Server error' });
     }
 }) 
+
+// GET boking spot 
+router.get('/:id',async(req:Request,res:Response)=>{
+  const spotId = parseInt(req.params.id,10) 
+  if (isNaN(spotId)){
+      res.status(400).json({error: 'Invalid id' })
+      return
+  }
+  try {
+      const {rows} = await client.query(`
+          SELECT * FROM parking_spots WHERE id = $1`, [spotId])
+      if(rows.length === 0){
+          res.status(404).json({error: 'Spot not found'})
+          return
+      }
+      res.json({spot:rows[0]})
+  } catch (error) {
+      console.error('Error getting spot',error)
+      res.status(500).json({error: 'Server error'})
+  }
+})
+
 export default router;

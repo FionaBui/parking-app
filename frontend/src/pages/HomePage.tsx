@@ -14,14 +14,20 @@ const HomePage = () => {
   const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
   const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
   // Hämta listan igen när nytt datum väljs
-  useEffect(() => {
-    if (selectedDate) {
-      fetch(
-        `http://localhost:3001/parking-spots?date=${selectedDate}&user=${currentUserId}`
-      )
-        .then((res) => res.json())
-        .then((data) => setAllSpots(data));
+  const fetchSpots = async (date: string) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/parking-spots?date=${date}&user=${currentUserId}`
+      );
+      const data = await res.json();
+      setAllSpots(data);
+    } catch (error) {
+      console.error("Error fetching parking spots:", error);
     }
+  };
+
+  useEffect(() => {
+    fetchSpots(selectedDate);
   }, [selectedDate]);
 
   const selectedSpotDetail = allSpots.find((s) => s.spot_id === selectedSpotId);
@@ -45,13 +51,7 @@ const HomePage = () => {
             <SpotDetails
               selectedSpot={selectedSpotDetail}
               selectedDate={selectedDate}
-              onBooked={() => {
-                fetch(
-                  `http://localhost:3001/parking-spots?date=${selectedDate}&user=${currentUserId}`
-                )
-                  .then((res) => res.json())
-                  .then((data) => setAllSpots(data));
-              }}
+              onBooked={() => fetchSpots(selectedDate)}
               currentUserId={currentUserId}
             />
           </div>

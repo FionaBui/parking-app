@@ -24,14 +24,14 @@ function ParkingMap({ spotStatus, selectedSpotId, onSelect }: Props) {
                 const isSelected = selectedSpotId === spot?.spot_id;
 
                 let btnClass = "btn btn-secondary";
-                if (spot?.is_rented) {
+                if (isSelected) {
+                  btnClass = "btn btn-warning";
+                } else if (spot?.is_rented) {
                   btnClass = "btn btn-danger";
                 } else if (spot?.is_owner) {
                   btnClass = "btn btn-primary";
                 } else if (spot?.is_available) {
-                  btnClass = isSelected ? "btn btn-primary" : "btn btn-success";
-                } else if (spot?.is_registered) {
-                  btnClass = "btn btn-danger";
+                  btnClass = "btn btn-success";
                 }
 
                 //  Vi gör så att platsen är röd även om den inte är uthyrd, men ägs av någon annan och inte är redo att hyras ut. Detta gör det tydligt för användaren att någon annan redan har registrerat platsen.

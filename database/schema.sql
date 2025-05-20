@@ -1,6 +1,7 @@
-DROP TABLE IF EXISTS rentals;
-DROP TABLE IF EXISTS parking_spots;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS rentals CASCADE;
+DROP TABLE IF EXISTS parking_spots CASCADE;
+DROP TABLE IF EXISTS available_spot CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -11,19 +12,30 @@ CREATE TABLE users (
 
 CREATE TABLE parking_spots (
   id SERIAL PRIMARY KEY,
-  location TEXT UNIQUE NOT NULL, -- A-1, B-25,...
-  owner_id INTEGER,              -- NULL if no one rents
-  start_time TIMESTAMP,
-  end_time TIMESTAMP,
-  price INTEGER DEFAULT 0,
+  location TEXT UNIQUE NOT NULL,   -- A-1, B-25, ...
+  owner_id INTEGER ,
   FOREIGN KEY (owner_id) REFERENCES users(id)
+);
+
+CREATE TABLE available_spot(
+  id SERIAL PRIMARY KEY,
+  spot_id INTEGER NOT NULL,              -- NULL if no one rents
+  date DATE NOT NULL,  
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  price INTEGER DEFAULT 0,
+  FOREIGN KEY (spot_id) REFERENCES parking_spots(id),
+  UNIQUE (spot_id, date)
 );
 
 CREATE TABLE rentals (
   id SERIAL PRIMARY KEY,
   spot_id INTEGER NOT NULL,
   renter_id INTEGER NOT NULL,
-  rent_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  rent_date DATE NOT NULL,
+  rent_start_time TIME NOT NULL,
+  rent_end_time TIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (spot_id) REFERENCES parking_spots(id),
   FOREIGN KEY (renter_id) REFERENCES users(id)
 );
@@ -51,12 +63,27 @@ INSERT INTO parking_spots (location) VALUES
 ('B-16'), ('B-17'), ('B-18'), ('B-19'), ('B-20'),
 ('B-21'), ('B-22'), ('B-23'), ('B-24'), ('B-25');
 
-UPDATE parking_spots SET owner_id = 1, start_time = '2025-05-21 08:00', end_time = '2025-05-21 18:00', price = 25 WHERE location = 'A-1';
-UPDATE parking_spots SET owner_id = 2, start_time = '2025-05-21 09:00', end_time = '2025-05-21 17:00', price = 20 WHERE location = 'B-1';
-UPDATE parking_spots SET owner_id = 3 WHERE location = 'B-2';
+UPDATE parking_spots
+SET owner_id = 1
+WHERE location = 'A-1';
+
+UPDATE parking_spots
+SET owner_id = 2
+WHERE location = 'B-1';
+
+UPDATE parking_spots
+SET owner_id = 3
+WHERE location = 'B-2';
+
+UPDATE parking_spots
+SET owner_id = 4
+WHERE location = 'A-2';
+
+-- available_spot
+INSERT INTO available_spot (spot_id, date, start_time, end_time, price) VALUES (1,'2025-05-23', '07:00', '17:00', 1);
 
 -- rentals
-INSERT INTO rentals (spot_id, renter_id, rent_time)
-VALUES 
-  (1, 3, '2025-05-21 10:00:00');  -- Bob rent A-1
+INSERT INTO rentals (spot_id, renter_id, rent_date, rent_start_time, rent_end_time)
+VALUES (1, 3, '2025-05-23', '08:00', '12:00');
+
 

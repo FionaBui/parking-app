@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { SpotStatus } from "../types";
 
 type Props = {
@@ -14,17 +14,22 @@ function SpotDetails({
   onBooked,
   currentUserId,
 }: Props) {
-  const [startTime, setStartTime] = useState(
-    selectedSpot.start_time?.slice(11, 16) || "00:00"
-  );
-  const [endTime, setEndTime] = useState(
-    selectedSpot.end_time?.slice(11, 16) || "23:00"
-  );
-  const [price, setPrice] = useState<number>(selectedSpot.price || 0);
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("23:00");
+  const [price, setPrice] = useState<number>(0);
+
+  useEffect(() => {
+    setStartTime(selectedSpot.start_time?.slice(0, 5) || "00:00");
+    setEndTime(selectedSpot.end_time?.slice(0, 5) || "23:00");
+    setPrice(selectedSpot.price || 0);
+  }, [selectedSpot]);
 
   if (!selectedSpot) return null;
 
   const isMineSpot = selectedSpot.renter_id === currentUserId;
+  const isOwner = selectedSpot.is_owner;
+  const isRented = selectedSpot.is_rented;
+  const isAvailable = selectedSpot.is_available;
 
   const handleUpdateSpot = async () => {
     if (startTime >= endTime) {
@@ -38,14 +43,25 @@ function SpotDetails({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: currentUserId,
-          start_time: `${selectedDate}T${startTime}`,
-          end_time: `${selectedDate}T${endTime}`,
+          date: selectedDate,
+          start_time: startTime,
+          end_time: endTime,
           price,
         }),
       }
     );
     if (res.ok) {
       alert("Spot updated");
+      onBooked();
+    }
+  };
+
+  const handleCancelAvailability = async () => {
+    const res = await fetch(
+      `http://localhost:3001/parking-spots/${selectedSpot.spot_id}/availability?date=${selectedDate}&user=${currentUserId}`,
+      { method: "DELETE" }
+    );
+    if (res.ok) {
       onBooked();
     }
   };
@@ -86,38 +102,34 @@ function SpotDetails({
   let isDisabled = false;
   let onClick = handleBooking;
 
-  if (!selectedSpot.is_registered) {
-    buttonText = "Not registered";
-    isDisabled = true;
-  } else if (selectedSpot.is_rented) {
+  if (isRented) {
     if (isMineSpot) {
       buttonText = "Cancel booking";
-      isDisabled = false;
       onClick = handleCancelBooking;
     } else {
       buttonText = "Already booked";
       isDisabled = true;
     }
-  } else if (!selectedSpot.is_available) {
+  } else if (!isAvailable) {
     buttonText = "Busy";
     isDisabled = true;
   }
 
-  const statusText = selectedSpot.is_rented
+  const statusText = isRented
     ? isMineSpot
       ? "You booked this spot"
       : "Booked"
-    : selectedSpot.is_available
+    : isAvailable
     ? "Available"
-    : selectedSpot.is_registered
-    ? "Busy"
-    : "Not registered";
+    : isOwner
+    ? "Not available"
+    : "Unavailable";
 
   return (
     <>
       <div className="card shadow-sm" style={{ minWidth: "260px" }}>
         <h5>Detail</h5>
-        {selectedSpot.is_owner ? (
+        {isOwner ? (
           <>
             <p>
               <strong>Your spot:</strong> {selectedSpot.spot_number}
@@ -129,6 +141,7 @@ function SpotDetails({
                 className="form-control"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
+                disabled={isRented}
               />
             </div>
             <div className="mb-2">
@@ -138,21 +151,41 @@ function SpotDetails({
                 className="form-control"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
+                disabled={isRented}
               />
             </div>
             <div className="mb-2">
-              <label className="form-label">Price</label>
+              <label className="form-label">Price (SEK/hour)</label>
               <input
                 type="number"
                 className="form-control"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
+                disabled={isRented}
               />
             </div>
-            <div>
-              <button className="btn btn-primary" onClick={handleUpdateSpot}>
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-primary"
+                onClick={handleUpdateSpot}
+                disabled={isRented}
+              >
                 Update
               </button>
+              {selectedSpot.is_available && (
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={handleCancelAvailability}
+                  disabled={isRented}
+                >
+                  Cancel listing
+                </button>
+              )}
+              {isRented && (
+                <div className="alert alert-warning mt-2">
+                  This spot is currently rented and cannot be cancelled.
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -165,16 +198,10 @@ function SpotDetails({
             </p>
             {selectedSpot.start_time && selectedSpot.end_time && (
               <p>
-                <strong>Tid:</strong>
-                {new Date(selectedSpot.start_time).toLocaleTimeString("sv-SE", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}{" "}
-                -{""}
-                {new Date(selectedSpot.end_time).toLocaleTimeString("sv-SE", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                <strong>Time:</strong>
+                {""}
+                {selectedSpot.start_time.slice(0, 5)} -{""}
+                {selectedSpot.end_time.slice(0, 5)}
               </p>
             )}
             <button
