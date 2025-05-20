@@ -45,4 +45,36 @@ router.post('/', async(req:Request, res:Response)=>{
     }
 })
 
+// DELETE: cancel rental spot
+
+router.delete('/cancel', async(req:Request, res:Response)=>{
+  const spotId = parseInt(req.query.spot as string,10)
+  const userId = parseInt(req.query.user as string, 10)
+  const date = req.query.date as string
+
+  if(isNaN(spotId) || isNaN(userId) || !date){
+    res.status(400).json({error: "Missing spot, user or date"})
+  }
+
+  try {
+  // Kontrollera om hyresobjektet som ska raderas finns
+    const {rows : exists } = await client.query(
+        `SELECT * FROM rentals
+        WHERE spot_id =$1 AND renter_id = $2 AND rent_date = $3`,[spotId, userId, date]
+    ) 
+    if (exists.length === 0){
+        res.status(404).json({error: "Rental not found"})
+    }
+    const {rows : deleted} = await client.query(
+        `DELETE FROM rentals 
+        WHERE spot_id = $1 AND renter_id= $2 AND rent_date=$3
+        RETURNING *`,[spotId, userId,date]
+    )
+    res.status(200).json({rental: deleted[0]})
+  } catch (error) {
+    console.error("Error cancelling rental:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+})
+
 export default router;

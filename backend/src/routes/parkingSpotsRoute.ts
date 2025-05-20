@@ -53,7 +53,7 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// PUT Update spot information
+// PUT Update available spot information
 router.put('/:id', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id, 10)
     const {user_id, date, start_time, end_time, price} = req.body
@@ -108,7 +108,7 @@ router.put('/:id', async(req:Request, res:Response)=>{
     }
 })
 
-// DELETE 
+// DELETE available spot
 router.delete('/:id/availability', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id,10)
     const date = req.query.date as string
@@ -154,6 +154,7 @@ router.delete('/:id/availability', async(req:Request, res:Response)=>{
         res.status(500).json({ error: 'Server error' });
     }
 }) 
+
 
 // GET boking spot 
 router.get('/:id',async(req:Request,res:Response)=>{
