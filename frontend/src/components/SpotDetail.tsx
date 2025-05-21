@@ -17,6 +17,8 @@ function SpotDetails({
   const [startTime, setStartTime] = useState("00:00");
   const [endTime, setEndTime] = useState("23:00");
   const [price, setPrice] = useState<number>(0);
+  const [rentStartTime, setRentStartTime] = useState("00:00");
+  const [rentEndTime, setRentEndTime] = useState("23:00");
 
   useEffect(() => {
     setStartTime(selectedSpot.start_time?.slice(0, 5) || "00:00");
@@ -67,6 +69,36 @@ function SpotDetails({
   };
 
   const handleBooking = async () => {
+    if (rentStartTime >= rentEndTime) {
+      alert("Start time must be before end time");
+      return;
+    }
+
+    if (!selectedSpot.start_time || !selectedSpot.end_time) {
+      alert("This spot is not available at this time");
+      return;
+    }
+
+    if (
+      rentStartTime < selectedSpot.start_time.slice(0, 5) ||
+      rentEndTime > selectedSpot.end_time.slice(0, 5)
+    ) {
+      alert(
+        `❗ You can only book between ${selectedSpot.start_time.slice(
+          0,
+          5
+        )} and ${selectedSpot.end_time.slice(0, 5)}`
+      );
+      return;
+    }
+
+    console.log("Sending booking:", {
+      spot_id: selectedSpot.spot_id,
+      renter_id: currentUserId,
+      rent_date: selectedDate,
+      rent_start_time: rentStartTime,
+      rent_end_time: rentEndTime,
+    });
     const res = await fetch("http://localhost:3001/rentals", {
       method: "POST",
       headers: {
@@ -76,6 +108,8 @@ function SpotDetails({
         spot_id: selectedSpot.spot_id,
         renter_id: currentUserId,
         rent_date: selectedDate,
+        rent_start_time: rentStartTime,
+        rent_end_time: rentEndTime,
       }),
     });
     if (res.ok) {
@@ -194,16 +228,40 @@ function SpotDetails({
               <strong>Spot:</strong> {selectedSpot.spot_number}
             </p>
             <p>
-              <strong>Status</strong> {statusText}
+              <strong>Status: </strong> {statusText}
             </p>
-            {selectedSpot.start_time && selectedSpot.end_time && (
-              <p>
-                <strong>Time:</strong>
-                {""}
-                {selectedSpot.start_time.slice(0, 5)} -{""}
-                {selectedSpot.end_time.slice(0, 5)}
-              </p>
+            <p>
+              <strong>Available Time: </strong>
+              {selectedSpot.start_time?.slice(0, 5)} {"- "}
+              {selectedSpot.end_time?.slice(0, 5)}
+            </p>
+            {isAvailable && (
+              <>
+                <div className="mb-2">
+                  <label className="form-label">Your start time</label>
+                  <input
+                    type="time"
+                    className="form-control"
+                    value={rentStartTime}
+                    onChange={(e) => setRentStartTime(e.target.value)}
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Your end time</label>
+                  <input
+                    type="time"
+                    className="form-control"
+                    value={rentEndTime}
+                    onChange={(e) => setRentEndTime(e.target.value)}
+                  />
+                </div>
+                <p>
+                  <strong>Price: </strong>
+                  {selectedSpot.price}
+                </p>
+              </>
             )}
+
             <button
               className="btn btn-primary w-100 mt-2"
               disabled={isDisabled}

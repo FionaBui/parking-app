@@ -5,7 +5,7 @@ import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 
 const HomePage = () => {
-  const currentUserId = 3;
+  const currentUserId = 2;
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];

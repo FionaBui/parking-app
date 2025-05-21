@@ -3,44 +3,58 @@ import { client } from '../db';
 
 const router = express.Router();
 
-// POST
+// POST: Add a rental spot 
 router.post('/', async(req:Request, res:Response)=>{
-    const {spot_id, renter_id, rent_date} = req.body
+    const {spot_id, renter_id, rent_date, rent_start_time, rent_end_time} = req.body
 
-    if(!spot_id || !renter_id || !rent_date){
-        res.status(400).json({error: 'spot_id, renter_id and rent_date are required.'})
+    if(!spot_id || !renter_id || !rent_date ||!rent_start_time || !rent_end_time){
+        res.status(400).json({error: 'Missing required fields'})
         return
     }
 
     try {
-        // Hitta plats efter platssträng som A-1 → hämta ID
-        const {rows: spots} = await client.query(
-            'SELECT id, owner_id FROM parking_spots WHERE location = $1 AND owner_id IS NOT NULL',
-            [spot_id]
+        // 1.Kontrollera om det har hyrts ut den dagen
+        const {rows: exists} = await client.query(
+            'SELECT * FROM rentals WHERE spot_id = $1 AND rent_date = $2',
+            [spot_id, rent_date]
         )
 
-        if (spots.length === 0){
-            res.status(404).json({ error: 'Spot not found or not available for rent' })
-        }
-
-        const spotRentalId = spots[0].id
-
-        // 2. Kontrollera om det har hyrts ut den dagen
-        const {rows : rented} = await client.query(
-            'SELECT * FROM rentals WHERE spot_id = $1 AND DATE(rent_time) = $2',[spotRentalId, rent_date]
-        )
-
-        if(rented.length > 0){
-            res.status(400).json({ error: 'This spot is already rented on that day' });
+        if (exists.length > 0){
+            res.status(404).json({ error: 'This spot is already booked on that date' })
             return
         }
-        // 3. Lägga i rentals
-        const {rows: inserted} = await client.query(
-            'INSERT INTO rentals (spot_id, renter_id, rent_time) VALUES ($1,$2,$3) RETURNING *',[spotRentalId,renter_id,rent_date]
+
+        // 2. Hämta den tillgängliga tiden för platsen den dagen
+        const {rows: available} = await client.query(
+            `SELECT start_time, end_time FROM available_spot WHERE spot_id = $1 AND date=$2`,[spot_id, rent_date]
         )
-        res.status(201).json(inserted[0])
+
+        if (available.length === 0){
+            res.status(400).json({error: "This spot is not available on that date" })
+            return
+        }
+        const availableStart = available[0].start_time
+        const availableEnd = available[0].end_time
+
+        // 3. Jämför hyresgästens begärda tid med den tillgängliga tiden
+        if(rent_start_time < availableStart || rent_end_time > availableEnd){
+            res.status(400).json({error: 'Time is not available'})
+            return
+        }
+
+        // 4. Skapa bokning
+
+        const { rows: inserted } = await client.query(
+            `INSERT INTO rentals (spot_id, renter_id, rent_date, rent_start_time, rent_end_time)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING *`,
+            [spot_id, renter_id, rent_date, rent_start_time, rent_end_time]
+          );
+      
+        res.status(201).json({ message: "Rental created", rental: inserted[0] });
+        
     } catch (err) {
-        console.error('Error when booking', err);
+        console.error('Error creating rental', err);
         res.status(500).json({ error: 'Server error during booking' });
     }
 })
@@ -64,6 +78,7 @@ router.delete('/cancel', async(req:Request, res:Response)=>{
     ) 
     if (exists.length === 0){
         res.status(404).json({error: "Rental not found"})
+        return
     }
     const {rows : deleted} = await client.query(
         `DELETE FROM rentals 
