@@ -26,7 +26,7 @@ router.post('/', async(req:Request, res:Response)=>{
 
         // 2. Hämta den tillgängliga tiden för platsen den dagen
         const {rows: available} = await client.query(
-            `SELECT start_time, end_time FROM available_spot WHERE spot_id = $1 AND date=$2`,[spot_id, rent_date]
+            `SELECT start_time, end_time FROM available_spot WHERE spot_id = $1 AND date= CAST($2 AS DATE)`,[spot_id, rent_date]
         )
 
         if (available.length === 0){
