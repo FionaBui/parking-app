@@ -33,6 +33,19 @@ function SpotDetails({
   const isRented = selectedSpot.is_rented;
   const isAvailable = selectedSpot.is_available;
 
+  const durationInHours =
+    parseInt(rentEndTime.slice(0, 2)) - parseInt(rentStartTime.slice(0, 2)) ||
+    0;
+
+  const totalPrice = durationInHours * selectedSpot.price;
+
+  const isValidBookingTime =
+    selectedSpot.start_time &&
+    selectedSpot.end_time &&
+    rentStartTime < rentEndTime &&
+    rentStartTime >= selectedSpot.start_time.slice(0, 5) &&
+    rentEndTime <= selectedSpot.end_time.slice(0, 5);
+
   const handleUpdateSpot = async () => {
     if (startTime >= endTime) {
       alert("start time must be before end time");
@@ -257,8 +270,14 @@ function SpotDetails({
                 </div>
                 <p>
                   <strong>Price: </strong>
-                  {selectedSpot.price}
+                  {selectedSpot.price} SEK/hour
                 </p>
+                {isValidBookingTime && (
+                  <p>
+                    <strong>Total price: </strong>
+                    {totalPrice} SEK
+                  </p>
+                )}
               </>
             )}
 
