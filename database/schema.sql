@@ -19,7 +19,7 @@ CREATE TABLE parking_spots (
 
 CREATE TABLE available_spot(
   id SERIAL PRIMARY KEY,
-  spot_id INTEGER NOT NULL,              -- NULL if no one rents
+  spot_id INTEGER NOT NULL,              
   date DATE NOT NULL,  
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,

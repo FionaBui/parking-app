@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DateSelector from "../components/DateSelector";
 import ParkingMap from "../components/ParkingMap";
 import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
+import UserContext from "../store/UserContext";
 
 const HomePage = () => {
-  const currentUserId = 2;
+  const { user } = useContext(UserContext)!;
+  const currentUserId = Number(user?.id);
+  const navigate = useNavigate();
+
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -25,6 +30,12 @@ const HomePage = () => {
       console.error("Error fetching parking spots:", error);
     }
   };
+
+  useEffect(() => {
+    if (!currentUserId) {
+      navigate("/login");
+    }
+  }, [currentUserId, navigate]);
 
   useEffect(() => {
     fetchSpots(selectedDate);
