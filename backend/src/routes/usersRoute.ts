@@ -69,29 +69,37 @@ router.post('/login', async(req:Request,res:Response)=>{
 })
 
 router.get('/:id', async(req:Request, res:Response)=>{
-    const userId = parseInt(req.params.id,10)
-    if(isNaN(userId)){
-        res.status(400).json({error: 'Invalid user id'})
+    const userId = parseInt(req.params.id, 10)
+    if (isNaN(userId)){
+        res.status(400).json({error:'Invalid user ID'})
+        return
     }
     try {
-        const {rows:rentals} = await client.query( 
-            `SELECT rentals.*, parking_spots.location, parking_spots.price FROM rentals
-            JOIN parking_spots ON rentals.spot_id = parking_spots.id WHERE rentals.renter_id = $1`, [userId])
-        const {rows: spots_for_rent} = await client.query(
-            `SELECT ps.*,
-               EXISTS (
-                 SELECT 1 FROM rentals r WHERE r.spot_id = ps.id) AS is_rented
-            FROM parking_spots ps
-            WHERE ps.owner_id = $1`, [userId])
+        // 1. Hämta en lista över platser som den här användaren har hyrt
+        const {rows: rentalResult} = await client.query(
+            `SELECT r.*, ps.location
+            FROM rentals r 
+            JOIN parking_spots ps ON r.spot_id = ps.id
+            WHERE r.renter_id = $1`, [userId]
+        )
+        // 2. Hämta en lista över plats som den här användaren äger
+        const {rows: ownerSpotResult} = await client.query(
+            `SELECT * FROM parking_spots WHERE owner_id = $1`, [userId]
+        )
+        const ownerSpot = ownerSpotResult[0] || null;
+
+        // 3. result
         res.json({
-            user_id : userId,
-            total_rentals : rentals.length,
-            rentals,
-            spots_for_rent
+            user_id: userId,
+            total_rentals: rentalResult.length,
+            rentals: rentalResult,
+            owner_spot: ownerSpot,
         })
+
+        
     } catch (error) {
-        console.error('Error fetching user activity:', error)
-        res.status(500).json({error:'Server error'})
+        console.error('Error fetching user activity:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 })
 

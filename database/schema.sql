@@ -46,7 +46,17 @@ VALUES
   ('Fiona', 'fiona@example.com', '1303'),
   ('Alice', 'alice@example.com', '1002'),
   ('Bob', 'bob@example.com', '1402'),
-  ('Anna', 'anna@example.com', '1104');
+  ('Anna', 'anna@example.com', '1104'),
+  ('John', 'john@example.com', '1201'),
+  ('Jane', 'jane@example.com', '1302'),
+  ('Carlos', 'carlos@example.com', '1203'),
+  ('Emily', 'emily@example.com', '1301'),
+  ('Liam', 'liam@example.com', '1202'),
+  ('Sophia', 'sophia@example.com', '1102'),
+  ('Oliver', 'oliver@example.com', '1103'),
+  ('Maja', 'maja@example.com', '1401'),
+  ('Lucas', 'lucas@example.com', '1403'),
+  ('Elin', 'elin@example.com', '1001');
 
 
 -- 🅿️ Create 50 fixed parking spaces (A-1 → A-25, B-1 → B-25)
@@ -64,26 +74,30 @@ INSERT INTO parking_spots (location) VALUES
 ('B-21'), ('B-22'), ('B-23'), ('B-24'), ('B-25');
 
 UPDATE parking_spots
-SET owner_id = 1
-WHERE location = 'A-1';
-
-UPDATE parking_spots
-SET owner_id = 2
-WHERE location = 'B-1';
-
-UPDATE parking_spots
-SET owner_id = 3
-WHERE location = 'B-2';
-
-UPDATE parking_spots
-SET owner_id = 4
-WHERE location = 'A-2';
+SET owner_id = CASE 
+  WHEN location = 'A-1' THEN 1
+  WHEN location = 'A-2' THEN 2
+  WHEN location = 'A-3' THEN 3
+  WHEN location = 'A-4' THEN 4
+  WHEN location = 'A-5' THEN 5
+  WHEN location = 'A-6' THEN 6
+  WHEN location = 'A-7' THEN 7
+  WHEN location = 'B-1' THEN 8
+  WHEN location = 'B-2' THEN 9
+  WHEN location = 'B-3' THEN 10
+  WHEN location = 'B-4' THEN 11
+  WHEN location = 'B-5' THEN 12
+  WHEN location = 'B-6' THEN 13
+  WHEN location = 'B-7' THEN 14
+  ELSE owner_id
+END
+WHERE location IN ('A-1', 'A-2', 'A-3', 'A-4', 'A-5', 'A-6', 'A-7', 'B-1', 'B-2', 'B-3', 'B-4', 'B-5', 'B-6', 'B-7');
 
 -- available_spot
-INSERT INTO available_spot (spot_id, date, start_time, end_time, price) VALUES (1,'2025-05-23', '07:00', '17:00', 1);
+INSERT INTO available_spot (spot_id, date, start_time, end_time, price) VALUES (1,'2025-06-03', '07:00', '17:00', 1);
 
 -- rentals
 INSERT INTO rentals (spot_id, renter_id, rent_date, rent_start_time, rent_end_time)
-VALUES (1, 3, '2025-05-23', '08:00', '12:00');
+VALUES (1, 3, '2025-06-03', '08:00', '12:00');
 
 
