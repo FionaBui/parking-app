@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [apartment, setApartment] = useState("");
+  const [spotLocation, setSpotLocation] = useState("");
 
   const navigate = useNavigate();
 
@@ -47,19 +48,19 @@ const LoginPage = () => {
       const res = await fetch("http://localhost:3001/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, apartment_info: apartment }),
+        body: JSON.stringify({
+          name,
+          email,
+          apartment_info: apartment,
+          spot_location: spotLocation || undefined,
+        }),
       });
 
-      if (!res.ok) {
-        if (res.status === 409) {
-          alert("⚠️ Email already exists. Please login or use another email.");
-        } else {
-          alert("Registration failed");
-        }
-        return; // 🔴 THÊM return để dừng tại đâ
-      }
-
       const user = await res.json();
+      if (!res.ok) {
+        alert(user.error || "Registration failed");
+        return;
+      }
       login(user);
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -174,6 +175,18 @@ const LoginPage = () => {
                 className="form-control"
                 value={apartment}
                 onChange={(e) => setApartment(e.target.value)}
+              />
+            </div>
+            <div className="form-outline mb-3">
+              <label className="form-label" htmlFor="regSpotLocation">
+                Your parking spot (optional if you own one)
+              </label>
+              <input
+                type="text"
+                id="regSpotLocation"
+                className="form-control"
+                value={spotLocation}
+                onChange={(e) => setSpotLocation(e.target.value)}
               />
             </div>
 

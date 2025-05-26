@@ -5,8 +5,9 @@ import { error } from 'console';
 
 const router = express.Router();
 
+// Tạo tài khoản + gán spot
 router.post('/register', async(req:Request,res:Response)=>{
-    const {name, email, apartment_info } = req.body
+    const {name, email, apartment_info, spot_location } = req.body
 
     if(!name || !email || !apartment_info){
         res.status(400).json({error: 'Missing required fields'})
@@ -14,10 +15,31 @@ router.post('/register', async(req:Request,res:Response)=>{
     }
     
     try {
-        const {rows } = await client.query(
-            `INSERT INTO users (name , email, apartment_info) VALUES ($1,$2,$3)`,[name, email,apartment_info]
+        const {rows : existingUser } = await client.query (
+            `SELECT * FROM users WHERE email = $1`, [email]
         )
-        res.status(201).json(rows[0])
+        if(existingUser.length > 0){
+            res.status(400).json({error: 'Email already exists'})
+            return
+        }
+
+        const {rows: userRows } = await client.query(
+            `INSERT INTO users (name , email, apartment_info) VALUES ($1,$2,$3) RETURNING *`,[name, email,apartment_info]
+        )
+        const user = userRows[0];
+        // Nếu user nhập mã chỗ đỗ thì cập nhật owner_id của chỗ đó
+        if(spot_location){
+            const updateResult = await client.query(
+                `UPDATE parking_spots SET owner_id = $1 WHERE location = $2 AND owner_id IS NULL RETURNING *`, [user.id, spot_location]
+            )
+            if(updateResult.rows.length === 0){
+                res.status(400).json({error: 'Invalid or already-owned spot location'})
+                return
+            }
+
+            console.log('updateResult',updateResult);
+        }
+        res.status(201).json(user)
     } catch (error) {
         console.error('Error creating user:', error)
         res.status(500).json({error: 'Server error'})
