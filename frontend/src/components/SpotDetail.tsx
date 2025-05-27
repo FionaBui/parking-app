@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { SpotStatus } from "../types";
+import { Card, Button, Form, Alert } from "react-bootstrap";
 
 type Props = {
   selectedSpot: SpotStatus;
@@ -173,70 +174,63 @@ function SpotDetails({
     : "Unavailable";
 
   return (
-    <>
-      <div className="card shadow-sm" style={{ minWidth: "260px" }}>
-        <h5>Detail</h5>
+    <Card className="shadow-sm">
+      <Card.Body>
+        <Card.Title>Spot Detail</Card.Title>
         {isOwner ? (
           <>
             <p>
               <strong>Your spot:</strong> {selectedSpot.spot_number}
             </p>
-            <div className="mb-2">
-              <label className="form-label">Start Time</label>
-              <input
+            <Form.Group className="mb-2">
+              <Form.Label>Start Time</Form.Label>
+              <Form.Control
                 type="time"
-                className="form-control"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 disabled={isRented}
               />
-            </div>
-            <div className="mb-2">
-              <label className="form-label">End Time</label>
-              <input
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>End Time</Form.Label>
+              <Form.Control
                 type="time"
-                className="form-control"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 disabled={isRented}
               />
-            </div>
-            <div className="mb-2">
-              <label className="form-label">Price (SEK/hour)</label>
-              <input
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label className="form-label">Price (SEK/hour)</Form.Label>
+              <Form.Control
                 type="number"
-                className="form-control"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
                 disabled={isRented}
               />
-            </div>
+            </Form.Group>
             <div className="d-flex gap-2">
-              <button
-                className="btn btn-primary"
-                onClick={handleUpdateSpot}
-                disabled={isRented}
-              >
+              <Button onClick={handleUpdateSpot} disabled={isRented}>
                 Update
-              </button>
+              </Button>
               {selectedSpot.is_available && (
-                <button
-                  className="btn btn-outline-danger"
+                <Button
+                  variant="outline-danger"
                   onClick={handleCancelAvailability}
                   disabled={isRented}
                 >
                   Cancel listing
-                </button>
-              )}
-              {isRented && (
-                <div className="alert alert-warning mt-2">
-                  This spot is currently rented and cannot be cancelled.
-                </div>
+                </Button>
               )}
             </div>
+            {isRented && (
+              <Alert variant="warning" className="mt-2">
+                This spot is currently rented and cannot be cancelled.
+              </Alert>
+            )}
           </>
         ) : (
-          <div>
+          <>
             <p>
               <strong>Spot:</strong> {selectedSpot.spot_number}
             </p>
@@ -250,24 +244,22 @@ function SpotDetails({
             </p>
             {isAvailable && (
               <>
-                <div className="mb-2">
-                  <label className="form-label">Your start time</label>
-                  <input
+                <Form.Group className="mb-2">
+                  <Form.Label>Your start time</Form.Label>
+                  <Form.Control
                     type="time"
-                    className="form-control"
                     value={rentStartTime}
                     onChange={(e) => setRentStartTime(e.target.value)}
                   />
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Your end time</label>
+                </Form.Group>
+                <Form.Group className="mb-2">
+                  <Form.Label>Your end time</Form.Label>
                   <input
                     type="time"
-                    className="form-control"
                     value={rentEndTime}
                     onChange={(e) => setRentEndTime(e.target.value)}
                   />
-                </div>
+                </Form.Group>
                 <p>
                   <strong>Price: </strong>
                   {selectedSpot.price} SEK/hour
@@ -281,17 +273,17 @@ function SpotDetails({
               </>
             )}
 
-            <button
-              className="btn btn-primary w-100 mt-2"
+            <Button
+              className="w-100 mt-2"
               disabled={isDisabled}
               onClick={onClick}
             >
               {buttonText}
-            </button>
-          </div>
+            </Button>
+          </>
         )}
-      </div>
-    </>
+      </Card.Body>
+    </Card>
   );
 }
 

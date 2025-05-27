@@ -1,17 +1,24 @@
 import { useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
+import { useContext } from "react";
+import UserContext from "../store/UserContext";
+
 function Logout() {
   const navigate = useNavigate();
+  const { logout } = useContext(UserContext)!;
   const handleLogout = () => {
-    localStorage.removeItem("userId");
+    logout();
     navigate("/login");
   };
   return (
-    <button
-      className="btn btn-outline-light btn-sm ms-2"
+    <Button
+      variant="outline-light"
+      size="sm"
+      className="ms-2"
       onClick={handleLogout}
     >
       Logout
-    </button>
+    </Button>
   );
 }
 export default Logout;

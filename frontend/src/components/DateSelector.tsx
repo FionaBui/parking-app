@@ -1,3 +1,4 @@
+import { Button } from "react-bootstrap";
 type Props = {
   selectedDate: string;
   onSelect: (date: string) => void;
@@ -27,15 +28,13 @@ function DateSelector({ onSelect, selectedDate }: Props) {
         const isSelected = selectedDate === value;
 
         return (
-          <button
+          <Button
             key={value}
-            className={`btn ${
-              isSelected ? "btn-primary" : "btn-outline-secondary"
-            }`}
+            variant={isSelected ? "primary" : "outline-secondary"}
             onClick={() => onSelect(value)}
           >
             {label}
-          </button>
+          </Button>
         );
       })}
     </div>

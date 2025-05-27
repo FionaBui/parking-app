@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../store/UserContext";
+import { Form, Button, Nav } from "react-bootstrap";
 
 const LoginPage = () => {
   const { login } = useContext(UserContext)!;
@@ -70,132 +71,97 @@ const LoginPage = () => {
   };
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
-      <ul
-        className="nav nav-pills mb-3 justify-content-center"
-        id="pills-tab"
-        role="tablist"
-      >
-        <li className="nav-item" role="presentation">
-          <button
-            className={`nav-link ${activeTab === "login" ? "active" : ""}`}
+      <Nav variant="pills" className="justify-content-center mb-4">
+        <Nav.Item>
+          <Nav.Link
+            active={activeTab === "login"}
             onClick={() => setActiveTab("login")}
           >
             Login
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === "register" ? "active" : ""}`}
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            active={activeTab === "register"}
             onClick={() => setActiveTab("register")}
           >
             Register
-          </button>
-        </li>
-      </ul>
-      <div className="tab-content">
-        {activeTab === "login" && (
-          <form onSubmit={handleLogin}>
-            <div className="form-outline mb-4">
-              <label className="form-label" htmlFor="loginEmail">
-                Email address
-              </label>
-              <input
-                type="email"
-                id="loginEmail"
-                className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-outline mb-4">
-              <label className="form-label" htmlFor="loginPassword">
-                Password
-              </label>
-              <input
-                type="password"
-                id="loginPassword"
-                className="form-control"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Sign in
-            </button>
-          </form>
-        )}
-        {activeTab === "register" && (
-          <form onSubmit={handleRegister}>
-            <div className="form-outline mb-3">
-              <label className="form-label" htmlFor="regName">
-                Name
-              </label>
-              <input
-                type="text"
-                id="regName"
-                className="form-control"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
 
-            <div className="form-outline mb-3">
-              <label className="form-label" htmlFor="regEmail">
-                Email
-              </label>
-              <input
-                type="email"
-                id="regEmail"
-                className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+      {activeTab === "login" && (
+        <Form onSubmit={handleLogin}>
+          <Form.Group className="mb-3" controlId="loginEmail">
+            <Form.Label>Email address</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="loginPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <Button type="submit" variant="primary" className="w-100">
+            Sign in
+          </Button>
+        </Form>
+      )}
+      {activeTab === "register" && (
+        <Form onSubmit={handleRegister}>
+          <Form.Group className="mb-3" controlId="regName">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form.Group>
 
-            <div className="form-outline mb-3">
-              <label className="form-label" htmlFor="regPassword">
-                Password
-              </label>
-              <input
-                type="password"
-                id="regPassword"
-                className="form-control"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+          <Form.Group className="mb-3" controlId="regEmail">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
 
-            <div className="form-outline mb-3">
-              <label className="form-label" htmlFor="regApartment">
-                Apartment
-              </label>
-              <input
-                type="text"
-                id="regApartment"
-                className="form-control"
-                value={apartment}
-                onChange={(e) => setApartment(e.target.value)}
-              />
-            </div>
-            <div className="form-outline mb-3">
-              <label className="form-label" htmlFor="regSpotLocation">
-                Your parking spot (optional if you own one)
-              </label>
-              <input
-                type="text"
-                id="regSpotLocation"
-                className="form-control"
-                value={spotLocation}
-                onChange={(e) => setSpotLocation(e.target.value)}
-              />
-            </div>
+          <Form.Group className="mb-3" controlId="regApartment">
+            <Form.Label>Apartment info</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Example: 1202 or Lgh 3A"
+              value={apartment}
+              onChange={(e) => setApartment(e.target.value)}
+            />
+          </Form.Group>
 
-            <button type="submit" className="btn btn-success w-100">
-              Create Account
-            </button>
-          </form>
-        )}
-      </div>
+          <Form.Group className="mb-3" controlId="regSpotLocation">
+            <Form.Label>Parking Spot (if you own one)</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Example: A-1"
+              value={spotLocation}
+              onChange={(e) => setSpotLocation(e.target.value)}
+            />
+          </Form.Group>
+
+          <Button type="submit" variant="success" className="w-100">
+            Create Account
+          </Button>
+        </Form>
+      )}
     </div>
   );
 };

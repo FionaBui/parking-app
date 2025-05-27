@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import UserContext from "../store/UserContext";
 import { useNavigate } from "react-router-dom";
 import type { ProfileData } from "../types";
+import { Container, Row, Col, Card, ListGroup } from "react-bootstrap";
 
 const ProfilePage = () => {
   const { user } = useContext(UserContext)!;
@@ -27,36 +28,47 @@ const ProfilePage = () => {
 
   if (!profile) return <p>Loading...</p>;
   return (
-    <div>
-      <h2>Welcome {user?.name}</h2>
-      <section>
-        <h4>Spots you have rented</h4>
-        {profile.rentals.length === 0 ? (
-          <p>You haven't booked any spots yet.</p>
-        ) : (
-          <ul className="list-group">
-            {profile.rentals.map((r) => (
-              <li key={r.id} className="list-group-item">
-                <strong>{r.location}</strong> – {r.rent_date} at{" "}
-                {r.rent_start_time} - {r.rent_end_time} ({r.price} SEK/hour)
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      <section className="mt-4">
-        <h4>Your spot</h4>
-        {!profile.owner_spot ? (
-          <p>You do not own any spots.</p>
-        ) : (
-          <ul className="list-group">
-            <li key={profile.owner_spot.id} className="list-group-item">
-              <strong>{profile.owner_spot.location}</strong>
-            </li>
-          </ul>
-        )}
-      </section>
-    </div>
+    <Container className="mt-4">
+      <h2 className="mb-4 text-center">Profile</h2>
+      <Row>
+        <Col md={6}>
+          <Card>
+            <Card.Header as="h5">Your Bookings</Card.Header>
+            <Card.Body>
+              {profile.rentals.length === 0 ? (
+                <p>You haven't booked any parking spots yet.</p>
+              ) : (
+                <ListGroup>
+                  {profile.rentals.map((rental) => (
+                    <ListGroup.Item key={rental.id}>
+                      <strong>{rental.location}</strong> — {rental.rent_date},{" "}
+                      {rental.rent_start_time} - {rental.rent_end_time} (
+                      {rental.price} SEK/hour)
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md="6" className="mt-4 mt-md-0">
+          <Card>
+            <Card.Header as="h5">Your Parking Spot</Card.Header>
+            <Card.Body>
+              {!profile.owner_spot ? (
+                <p>You don't own a parking spot.</p>
+              ) : (
+                <ListGroup>
+                  <ListGroup.Item>
+                    <strong>{profile.owner_spot.location}</strong>
+                  </ListGroup.Item>
+                </ListGroup>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

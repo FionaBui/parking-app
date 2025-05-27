@@ -5,6 +5,7 @@ import ParkingMap from "../components/ParkingMap";
 import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 import UserContext from "../store/UserContext";
+import { Container, Row, Col, Card } from "react-bootstrap";
 
 const HomePage = () => {
   const { user } = useContext(UserContext)!;
@@ -44,31 +45,40 @@ const HomePage = () => {
   const selectedSpotDetail = allSpots.find((s) => s.spot_id === selectedSpotId);
 
   return (
-    <div className="flex flex-col gap-6">
-      <DateSelector
-        selectedDate={selectedDate}
-        onSelect={(date) => setSelectedDate(date)}
-      />
-      <div className="d-flex gap-4 mt-4">
-        <div className="flex-grow-1">
-          <ParkingMap
-            spotStatus={allSpots}
-            selectedSpotId={selectedSpotId}
-            onSelect={(spotId) => setSelectedSpotId(spotId)}
+    <Container>
+      <Row className="mb-4">
+        <Col>
+          <h3 className="text-center">📅 Select a Date</h3>
+          <DateSelector
+            selectedDate={selectedDate}
+            onSelect={(date) => setSelectedDate(date)}
           />
-        </div>
-        {selectedSpotDetail && (
-          <div style={{ minWidth: "280px" }}>
-            <SpotDetails
-              selectedSpot={selectedSpotDetail}
-              selectedDate={selectedDate}
-              onBooked={() => fetchSpots(selectedDate)}
-              currentUserId={currentUserId}
+        </Col>
+      </Row>
+      <Row>
+        <Col md={8}>
+          <Card className="p-3">
+            <ParkingMap
+              spotStatus={allSpots}
+              selectedSpotId={selectedSpotId}
+              onSelect={(spotId) => setSelectedSpotId(spotId)}
             />
-          </div>
-        )}
-      </div>
-    </div>
+          </Card>
+        </Col>
+        <Col md={4}>
+          {selectedSpotDetail && (
+            <Card className="p-3">
+              <SpotDetails
+                selectedSpot={selectedSpotDetail}
+                selectedDate={selectedDate}
+                onBooked={() => fetchSpots(selectedDate)}
+                currentUserId={currentUserId}
+              />
+            </Card>
+          )}
+        </Col>
+      </Row>
+    </Container>
   );
 };
 export default HomePage;

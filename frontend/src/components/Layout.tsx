@@ -7,13 +7,13 @@ const Layout = () => {
   const { user, logout } = useContext(UserContext)!;
   return (
     <>
-      <Navbar bg="primary" expand="lg" className="mb-4">
+      <Navbar bg="primary" variant="dark" expand="lg" className="mb-4">
         <Container>
-          <Navbar.Brand as={Link} to="/">
+          <Navbar.Brand as={Link} to="/" className="text-white">
             🚗 ParkingApp
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          <Navbar.Toggle aria-controls="navbar-nav" />
+          <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link as={Link} to="/">
                 Home
