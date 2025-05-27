@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DateSelector from "../components/DateSelector";
 import ParkingMap from "../components/ParkingMap";
@@ -20,17 +20,20 @@ const HomePage = () => {
   const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
   const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
   // Hämta listan igen när nytt datum väljs
-  const fetchSpots = async (date: string) => {
-    try {
-      const res = await fetch(
-        `http://localhost:3001/parking-spots?date=${date}&user=${currentUserId}`
-      );
-      const data = await res.json();
-      setAllSpots(data);
-    } catch (error) {
-      console.error("Error fetching parking spots:", error);
-    }
-  };
+  const fetchSpots = useCallback(
+    async (date: string) => {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/parking-spots?date=${date}&user=${currentUserId}`
+        );
+        const data = await res.json();
+        setAllSpots(data);
+      } catch (error) {
+        console.error("Error fetching parking spots:", error);
+      }
+    },
+    [currentUserId]
+  );
 
   useEffect(() => {
     if (!currentUserId) {
@@ -40,7 +43,7 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchSpots(selectedDate);
-  }, [selectedDate]);
+  }, [fetchSpots, selectedDate]);
 
   const selectedSpotDetail = allSpots.find((s) => s.spot_id === selectedSpotId);
 
