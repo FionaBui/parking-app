@@ -2,15 +2,20 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link, Outlet } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../store/UserContext";
+import "../assets/CSS/Layout.css";
 
 const Layout = () => {
   const { user, logout } = useContext(UserContext)!;
   return (
     <>
-      <Navbar bg="primary" variant="dark" expand="lg" className="mb-4">
-        <Container>
-          <Navbar.Brand as={Link} to="/" className="text-white">
-            🚗 ParkingApp
+      <Navbar expand="lg" className="mb-4 layout-nav">
+        <Container fluid className="mx-4">
+          <Navbar.Brand as={Link} to="/" className="text-white brand">
+            <img
+              src="../../public/Share_Parking_logo.png"
+              alt="logo-share-parking"
+              className="logo-img"
+            />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbar-nav" />
           <Navbar.Collapse id="navbar-nav">
@@ -34,7 +39,7 @@ const Layout = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Container>
+      <Container fluid>
         <Outlet />
       </Container>
     </>

@@ -1,0 +1,18 @@
+.layout-nav {
+  background-color: #ffffff;
+}
+.layout-nav .nav-link {
+  color: #299ebb;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+.layout-nav .nav-link:hover,
+.layout-nav .nav-link:focus {
+  transform: scale(1.05);
+}
+
+.logo-img {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+}

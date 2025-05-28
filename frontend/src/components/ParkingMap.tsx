@@ -24,9 +24,9 @@ function ParkingMap({ spotStatus, selectedSpotId, onSelect }: Props) {
                 );
                 const isSelected = selectedSpotId === spot?.spot_id;
 
-                let variant = "secondary";
+                let variant = "outline-secondary";
                 if (isSelected) {
-                  variant = "warning";
+                  variant = "secondary";
                 } else if (spot?.is_rented) {
                   variant = "danger";
                 } else if (spot?.is_owner) {

@@ -41,9 +41,17 @@ const ProfilePage = () => {
                 <ListGroup>
                   {profile.rentals.map((rental) => (
                     <ListGroup.Item key={rental.id}>
-                      <strong>{rental.location}</strong> — {rental.rent_date},{" "}
-                      {rental.rent_start_time} - {rental.rent_end_time} (
-                      {rental.price} SEK/hour)
+                      <p>
+                        <strong>{rental.location}</strong>
+                      </p>
+                      <p>
+                        <strong>Date: </strong> {rental.rent_date.slice(0, 10)}
+                      </p>
+                      <p>
+                        <strong>Time: </strong>
+                        {rental.rent_start_time.slice(0, 5)} -{" "}
+                        {rental.rent_end_time.slice(0, 5)}{" "}
+                      </p>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>

@@ -254,7 +254,7 @@ function SpotDetails({
                 </Form.Group>
                 <Form.Group className="mb-2">
                   <Form.Label>Your end time</Form.Label>
-                  <input
+                  <Form.Control
                     type="time"
                     value={rentEndTime}
                     onChange={(e) => setRentEndTime(e.target.value)}
