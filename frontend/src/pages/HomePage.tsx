@@ -49,7 +49,7 @@ const HomePage = () => {
 
   return (
     <>
-      <Container fluid className="">
+      <Container fluid>
         <Row>
           <h3 className="text-left mb-3  shadow-sm p-3">Select A Date</h3>
           <Col>

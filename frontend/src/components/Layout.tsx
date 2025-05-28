@@ -1,4 +1,4 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link, Outlet } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../store/UserContext";
@@ -21,14 +21,23 @@ const Layout = () => {
           <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link as={Link} to="/">
-                Home
+                Hello {user?.name}!
               </Nav.Link>
               {user ? (
                 <>
-                  <Nav.Link as={Link} to="/profile">
-                    Profile
-                  </Nav.Link>
-                  <Nav.Link onClick={logout}>Logout</Nav.Link>
+                  <NavDropdown
+                    align="end"
+                    id="nav-dropdown-dark-example"
+                    title={
+                      <i className="fa-solid fa-circle-user user-icon"></i>
+                    }
+                    menuVariant="dark"
+                  >
+                    <NavDropdown.Item as={Link} to="/profile">
+                      Profile
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                  </NavDropdown>
                 </>
               ) : (
                 <Nav.Link as={Link} to="/login">

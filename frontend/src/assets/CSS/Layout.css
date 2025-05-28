@@ -16,3 +16,30 @@
   width: auto;
   object-fit: contain;
 }
+
+/* Khi dropdown đang mở → Bootstrap tự gán class 'show' cho NavDropdown */
+.nav-item.dropdown.show .user-icon {
+  color: #f0c808;
+}
+
+.dropdown-menu {
+  width: auto !important;
+  min-width: unset !important;
+  padding-left: 0;
+  padding-right: 0;
+  background-color: #4f595d11;
+}
+
+.dropdown-item {
+  padding: 0.5rem 2rem;
+  white-space: nowrap;
+  color: #4f595d;
+}
+.dropdown-item:hover {
+  color: #f0c808;
+  background-color: #bbbaba2a;
+}
+
+.navbar-nav .nav-link.show {
+  color: #f0c808;
+}
