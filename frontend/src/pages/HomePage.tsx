@@ -49,10 +49,10 @@ const HomePage = () => {
 
   return (
     <>
-      <Container fluid className="bg-white shadow-sm p-3">
+      <Container fluid className="">
         <Row>
+          <h3 className="text-left mb-3  shadow-sm p-3">Select A Date</h3>
           <Col>
-            <h3 className="text-center mb-3">📅 Select A Date</h3>
             <DateSelector
               selectedDate={selectedDate}
               onSelect={(date) => setSelectedDate(date)}

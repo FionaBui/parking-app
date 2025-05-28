@@ -17,13 +17,6 @@ function DateSelector({ onSelect, selectedDate }: Props) {
 
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-  const formatLabel = (date: Date) =>
-    date.toLocaleDateString("us-US", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-    });
-
   const handleClick = (clickedDate: Date) => {
     setStartDate(clickedDate);
     onSelect(formatDate(clickedDate));
@@ -39,24 +32,44 @@ function DateSelector({ onSelect, selectedDate }: Props) {
   return (
     <div className="d-flex gap-2 m-4 overflow-auto justify-content-center">
       {!isAtToday && (
-        <Button variant="outline-dark" onClick={resetToToday}>
-          ←
-        </Button>
+        <button className="icon-button" onClick={resetToToday}>
+          <i className="fa-solid fa-angle-left"></i>
+        </button>
       )}
 
       {days.map((date) => {
         const value = formatDate(date);
-        const label = formatLabel(date);
         const isSelected = selectedDate === value;
+        const isToday = formatDate(date) === formatDate(today);
+
+        const weekday = isToday
+          ? "TODAY"
+          : date
+              .toLocaleDateString("en-US", {
+                weekday: "short",
+              })
+              .toUpperCase();
+
+        const day = date.toLocaleDateString("en-US", {
+          day: "2-digit",
+        });
+
+        const month = date
+          .toLocaleDateString("en-US", {
+            month: "short",
+          })
+          .toUpperCase();
 
         return (
           <Button
             key={value}
-            variant={isSelected ? "primary" : "outline-secondary"}
+            variant={isSelected ? "primary" : "light"}
             onClick={() => handleClick(date)}
-            className="date-btn d-flex flex-column justify-content-center align-items-center"
+            className="date-btn d-flex flex-column justify-content-center align-items-center mx-3"
           >
-            {label}
+            <small className="weekday">{weekday}</small>
+            <small className="date-number">{day}</small>
+            <small className="month">{month}</small>
           </Button>
         );
       })}

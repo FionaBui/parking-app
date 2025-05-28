@@ -8,6 +8,7 @@
 html,
 body {
   height: 100%;
+  color: #4f595d;
 }
 :root {
   --bs-body-font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;

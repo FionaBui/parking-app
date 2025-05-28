@@ -5,8 +5,50 @@
   padding: 8px;
   transition: all 0.2s ease-in-out;
   font-size: 0.9rem;
+  color: #4f595d;
 }
-/* 
-.date-btn:hover:not(:disabled) {
-  transform: scale(1.1);
-} */
+
+.date-btn.btn-primary {
+  background-color: #299ebb;
+  color: white;
+  border: none;
+}
+.btn-light {
+  background-color: white;
+}
+
+.btn-light:hover {
+  background-color: white;
+  color: #299ebb;
+  border-color: #299ebb;
+  transition: all 0.2s ease-in-out;
+}
+.icon-button {
+  background: none; /* không nền */
+  border: none; /* không viền */
+  padding: 0.5rem;
+  font-size: 1.6rem;
+  color: #000; /* màu icon */
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: none;
+  color: #299ebb;
+  transition: all 0.2s ease-in-out;
+}
+.weekday {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.date-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.month {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
