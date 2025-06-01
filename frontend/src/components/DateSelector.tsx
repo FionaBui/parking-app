@@ -15,7 +15,10 @@ function DateSelector({ onSelect, selectedDate }: Props) {
     return date;
   });
 
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("sv-SE", {
+      timeZone: "Europe/Stockholm",
+    });
 
   const handleClick = (clickedDate: Date) => {
     setStartDate(clickedDate);
@@ -30,7 +33,7 @@ function DateSelector({ onSelect, selectedDate }: Props) {
   const isAtToday = formatDate(startDate) === formatDate(today);
 
   return (
-    <div className="d-flex gap-2 m-4 overflow-auto justify-content-center">
+    <div className="date-selector-container">
       {!isAtToday && (
         <button className="icon-button" onClick={resetToToday}>
           <i className="fa-solid fa-angle-left"></i>

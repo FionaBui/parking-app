@@ -1,4 +1,4 @@
-.date-btn {
+/* .date-btn {
   width: 90px;
   height: 100px;
   border-radius: 8px;
@@ -6,6 +6,29 @@
   transition: all 0.2s ease-in-out;
   font-size: 0.9rem;
   color: #4f595d;
+} */
+
+.date-selector-container {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem;
+  overflow-x: auto;
+  justify-content: center;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+
+.date-btn {
+  flex: 0 0 auto;
+  width: 90px;
+  height: 100px;
+  border-radius: 8px;
+  padding: 8px;
+  transition: all 0.2s ease-in-out;
+  font-size: 0.9rem;
+  color: #4f595d;
+  scroll-snap-align: center;
 }
 
 .date-btn.btn-primary {
@@ -51,4 +74,48 @@
 .month {
   font-size: 0.8rem;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .date-selector-container {
+    justify-content: flex-start;
+  }
+  .date-btn {
+    width: 75px;
+    height: 90px;
+    font-size: 0.85rem;
+  }
+
+  .date-number {
+    font-size: 1.5rem;
+  }
+
+  .month,
+  .weekday {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .date-selector-container {
+    justify-content: flex-start;
+  }
+  .date-btn {
+    width: 60px;
+    height: 80px;
+    font-size: 0.8rem;
+  }
+
+  .weekday,
+  month {
+    font-size: 0.65rem;
+  }
+
+  .date-number {
+    font-size: 1.3rem;
+  }
+
+  .icon-button {
+    font-size: 1.2rem;
+  }
 }

@@ -45,7 +45,13 @@ const ProfilePage = () => {
                         <strong>{rental.location}</strong>
                       </p>
                       <p>
-                        <strong>Date: </strong> {rental.rent_date.slice(0, 10)}
+                        <strong>Date: </strong>{" "}
+                        {new Date(rental.rent_date).toLocaleDateString(
+                          "sv-SE",
+                          {
+                            timeZone: "Europe/Stockholm",
+                          }
+                        )}
                       </p>
                       <p>
                         <strong>Time: </strong>

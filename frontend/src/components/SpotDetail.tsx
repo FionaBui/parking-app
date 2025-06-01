@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { SpotStatus } from "../types";
 import { Card, Button, Form, Alert } from "react-bootstrap";
+import "../assets/CSS/SpotDetail.css";
 
 type Props = {
   selectedSpot: SpotStatus;
@@ -149,14 +150,17 @@ function SpotDetails({
   let buttonText = "Book now";
   let isDisabled = false;
   let onClick = handleBooking;
+  let className = "booking-btn";
 
   if (isRented) {
     if (isMineSpot) {
       buttonText = "Cancel booking";
+      className += " cancel";
       onClick = handleCancelBooking;
     } else {
-      buttonText = "Already booked";
+      buttonText = "Busy";
       isDisabled = true;
+      className += " cancel";
     }
   } else if (!isAvailable) {
     buttonText = "Busy";
@@ -166,15 +170,13 @@ function SpotDetails({
   const statusText = isRented
     ? isMineSpot
       ? "You booked this spot"
-      : "Booked"
+      : "Busy"
     : isAvailable
     ? "Available"
-    : isOwner
-    ? "Not available"
-    : "Unavailable";
+    : "Not available";
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <Card.Body>
         <Card.Title>Spot Detail</Card.Title>
         {isOwner ? (
@@ -209,23 +211,29 @@ function SpotDetails({
                 disabled={isRented}
               />
             </Form.Group>
-            <div className="d-flex gap-2">
-              <Button onClick={handleUpdateSpot} disabled={isRented}>
-                Update
-              </Button>
-              {selectedSpot.is_available && (
+            {!isRented && (
+              <div className="d-flex gap-2">
                 <Button
-                  variant="outline-danger"
-                  onClick={handleCancelAvailability}
-                  disabled={isRented}
+                  variant="light"
+                  className="update-btn"
+                  onClick={handleUpdateSpot}
                 >
-                  Cancel listing
+                  Update
                 </Button>
-              )}
-            </div>
+                {selectedSpot.is_available && (
+                  <Button
+                    variant="outline-danger"
+                    onClick={handleCancelAvailability}
+                  >
+                    Cancel listing
+                  </Button>
+                )}
+              </div>
+            )}
+
             {isRented && (
               <Alert variant="warning" className="mt-2">
-                This spot is currently rented and cannot be cancelled.
+                Your spot is currently rented and cannot be cancelled.
               </Alert>
             )}
           </>
@@ -274,7 +282,8 @@ function SpotDetails({
             )}
 
             <Button
-              className="w-100 mt-2"
+              variant="light"
+              className={`${className} w-100 mt-2`}
               disabled={isDisabled}
               onClick={onClick}
             >

@@ -6,6 +6,7 @@ import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 import UserContext from "../store/UserContext";
 import { Container, Row, Col, Card } from "react-bootstrap";
+import "../assets/CSS/HomePage.css";
 
 const HomePage = () => {
   const { user } = useContext(UserContext)!;
@@ -14,7 +15,9 @@ const HomePage = () => {
 
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
-    return today.toISOString().split("T")[0];
+    return today.toLocaleDateString("sv-SE", {
+      timeZone: "Europe/Stockholm",
+    });
   });
 
   const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
@@ -62,9 +65,9 @@ const HomePage = () => {
       </Container>
       <Container fluid className="mt-4">
         <Row>
-          <h3 className="p-3">Pick Your Parking Spot</h3>
+          <h3 className="shadow-sm p-3 mb-3">Pick Your Parking Spot</h3>
           <Col md={8}>
-            <Card className="p-3">
+            <Card className="p-3 shadow mb-5 bg-body rounded">
               <ParkingMap
                 spotStatus={allSpots}
                 selectedSpotId={selectedSpotId}
@@ -74,7 +77,7 @@ const HomePage = () => {
           </Col>
           <Col md={4}>
             {selectedSpotDetail && (
-              <Card className="p-3">
+              <Card className="p-3 shadow">
                 <SpotDetails
                   selectedSpot={selectedSpotDetail}
                   selectedDate={selectedDate}

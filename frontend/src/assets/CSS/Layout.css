@@ -19,7 +19,7 @@
 
 /* Khi dropdown đang mở → Bootstrap tự gán class 'show' cho NavDropdown */
 .nav-item.dropdown.show .user-icon {
-  color: #f0c808;
+  color: #f2a63d;
 }
 
 .dropdown-menu {
@@ -36,10 +36,10 @@
   color: #4f595d;
 }
 .dropdown-item:hover {
-  color: #f0c808;
+  color: #299ebb;
   background-color: #bbbaba2a;
 }
 
 .navbar-nav .nav-link.show {
-  color: #f0c808;
+  color: #f2a63d;
 }

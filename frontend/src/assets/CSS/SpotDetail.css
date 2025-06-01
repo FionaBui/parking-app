@@ -1,0 +1,22 @@
+.update-btn {
+  border-color: #299ebb;
+  color: #299ebb;
+}
+.update-btn:hover {
+  background-color: #299ebb;
+  border-color: #299ebb;
+  color: white;
+}
+.booking-btn {
+  border-color: #299ebb;
+  color: #299ebb;
+}
+.book-now-btn:hover {
+  background-color: #299ebb;
+  border-color: #299ebb;
+  color: white;
+}
+.booking-btn.cancel {
+  border-color: #e73d1b;
+  color: #e73d1b;
+}
