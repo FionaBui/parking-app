@@ -44,6 +44,7 @@ function ParkingMap({ spotStatus, selectedSpotId, onSelect }: Props) {
       }
       return (
         <Button
+          key={spotNumber}
           variant="light"
           className={`${className} w-100 fw-bold text-nowrap rounded-0 mb-3 p-0 spot-button`}
           onClick={() => spot && onSelect(spot.spot_id)}

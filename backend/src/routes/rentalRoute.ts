@@ -5,6 +5,7 @@ const router = express.Router();
 
 // POST: Add a rental spot 
 router.post('/', async(req:Request, res:Response)=>{
+    console.log("Booking request received:", req.body);
     const {spot_id, renter_id, rent_date, rent_start_time, rent_end_time} = req.body
 
     if(!spot_id || !renter_id || !rent_date ||!rent_start_time || !rent_end_time){
@@ -37,10 +38,15 @@ router.post('/', async(req:Request, res:Response)=>{
         const availableEnd = available[0].end_time
 
         // 3. Jämför hyresgästens begärda tid med den tillgängliga tiden
-        if(rent_start_time < availableStart || rent_end_time > availableEnd){
-            res.status(400).json({error: 'Time is not available'})
-            return
-        }
+        const start = new Date(`1970-01-01T${rent_start_time}:00`);
+        const end = new Date(`1970-01-01T${rent_end_time}:00`);
+        const availableStartTime = new Date(`1970-01-01T${availableStart}:00`);
+        const availableEndTime = new Date(`1970-01-01T${availableEnd}:00`);
+
+        if (start < availableStartTime || end > availableEndTime) {
+        res.status(400).json({ error: "Time is not available" });
+        return;
+}
 
         // 4. Skapa bokning
 

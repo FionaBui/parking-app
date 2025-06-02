@@ -4,11 +4,11 @@ import { client } from '../db';
 
 const router = express.Router();
 
-// Hämta alla parkeringsplatser
+// Hämtar alla 50 parkeringsplatser och visar deras status (ledig, uthyrd, ägd av dig) för ett valt datum.
 router.get('/', async (req: Request, res: Response) => {
   const date = req.query.date as string;
   const userId = parseInt(req.query.user as string , 10)
-
+  // kontrollen säkerställer att vi inte gör onödiga databasfrågor om någon glömmer skicka med date eller userId
   if (!date || isNaN(userId)) {
    res.status(400).json({ error: 'Missing date or user ID' });
    return 
@@ -28,7 +28,7 @@ router.get('/', async (req: Request, res: Response) => {
         [date]
       );
 
-    // 3.kombinera för att generera data för att återgå till frontend
+    // 4.kombinera för att generera data för att återgå till frontend
     const result = allSpots.map((spot) => {
         const availableSpot = available.find(a=>a.spot_id === spot.spot_id)
       const rentalSpot = rented.find(r => r.spot_id === spot.spot_id)
@@ -53,7 +53,7 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// PUT Update available spot information
+// PUT Uppdaterar eller skapar ett nytt tillgängplats (om du är ägare).
 router.put('/:id', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id, 10)
     const {user_id, date, start_time, end_time, price} = req.body
@@ -108,7 +108,7 @@ router.put('/:id', async(req:Request, res:Response)=>{
     }
 })
 
-// DELETE available spot
+// DELETE Tar bort tillgängligheten en viss dag, men bara om ingen har hyrt den.
 router.delete('/:id/availability', async(req:Request, res:Response)=>{
     const spotId = parseInt(req.params.id,10)
     const date = req.query.date as string
@@ -118,7 +118,7 @@ router.delete('/:id/availability', async(req:Request, res:Response)=>{
         return
     }
     try {
-      // Kontrollera ägarskap
+      // Kontrollera om användaren är ägare
       const {rows : checkOwner} = await client.query(
         `SELECT * FROM parking_spots 
         WHERE id = $1 AND owner_id = $2`,
@@ -128,7 +128,7 @@ router.delete('/:id/availability', async(req:Request, res:Response)=>{
         res.status(403).json({error: 'Not the owner of this spot'})
         return
       }
-      // Kontrollera om några uthyrare använder den här platsen
+      // Kontrollera om platsen redan är bokad för det datumet
       const {rows:rentalCheck} = await client.query(
         'SELECT * FROM rentals WHERE spot_id = $1 AND rent_date = $2',
         [spotId, date]
@@ -138,7 +138,7 @@ router.delete('/:id/availability', async(req:Request, res:Response)=>{
           return
         }
 
-        // If no one has booked, proceed to delete
+        // Om inte bokad, ta bort tillgängligheten
         const {rows: deleted} = await client.query(
             `DELETE FROM available_spot 
             WHERE spot_id = $1 AND date = $2 RETURNING *`,
@@ -156,7 +156,7 @@ router.delete('/:id/availability', async(req:Request, res:Response)=>{
 }) 
 
 
-// GET boking spot 
+// GET /:id Hämtar en viss plats med sitt id.
 router.get('/:id',async(req:Request,res:Response)=>{
   const spotId = parseInt(req.params.id,10) 
   if (isNaN(spotId)){

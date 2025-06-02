@@ -5,7 +5,7 @@ import { error } from 'console';
 
 const router = express.Router();
 
-// Tạo tài khoản + gán spot
+// POST /register – Registrera användare + knyta parkeringsplats
 router.post('/register', async(req:Request,res:Response)=>{
     const {name, email, apartment_info, spot_location } = req.body
 
@@ -27,7 +27,7 @@ router.post('/register', async(req:Request,res:Response)=>{
             `INSERT INTO users (name , email, apartment_info) VALUES ($1,$2,$3) RETURNING *`,[name, email,apartment_info]
         )
         const user = userRows[0];
-        // Nếu user nhập mã chỗ đỗ thì cập nhật owner_id của chỗ đó
+        // Om användaren anger en parkeringsplatskod, uppdatera owner_id för den platsen.
         if(spot_location){
             const updateResult = await client.query(
                 `UPDATE parking_spots SET owner_id = $1 WHERE location = $2 AND owner_id IS NULL RETURNING *`, [user.id, spot_location]
@@ -46,6 +46,7 @@ router.post('/register', async(req:Request,res:Response)=>{
     }
 })
 
+// POST /login – Logga in användare
 router.post('/login', async(req:Request,res:Response)=>{
     const {email} = req.body
 
@@ -68,6 +69,7 @@ router.post('/login', async(req:Request,res:Response)=>{
     }
 })
 
+// GET /:id – Hämta användarens aktivitet
 router.get('/:id', async(req:Request, res:Response)=>{
     const userId = parseInt(req.params.id, 10)
     if (isNaN(userId)){

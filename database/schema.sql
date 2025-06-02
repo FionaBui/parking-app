@@ -43,7 +43,7 @@ CREATE TABLE rentals (
 -- users
 INSERT INTO users (name, email, apartment_info)
 VALUES 
-  ('Fiona', 'fiona@example.com', '1303'),
+  ('Clare', 'clare@example.com', '1303'),
   ('Alice', 'alice@example.com', '1002'),
   ('Bob', 'bob@example.com', '1402'),
   ('Anna', 'anna@example.com', '1104'),

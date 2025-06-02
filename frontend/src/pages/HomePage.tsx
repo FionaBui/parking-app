@@ -30,6 +30,7 @@ const HomePage = () => {
           `http://localhost:3001/parking-spots?date=${date}&user=${currentUserId}`
         );
         const data = await res.json();
+        console.log("date", date);
         setAllSpots(data);
       } catch (error) {
         console.error("Error fetching parking spots:", error);
