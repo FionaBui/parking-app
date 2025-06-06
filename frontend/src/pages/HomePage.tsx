@@ -5,7 +5,14 @@ import ParkingMap from "../components/ParkingMap";
 import SpotDetails from "../components/SpotDetail";
 import type { SpotStatus } from "../types";
 import UserContext from "../store/UserContext";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import "../assets/CSS/HomePage.css";
 
 const HomePage = () => {
@@ -22,6 +29,23 @@ const HomePage = () => {
 
   const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
   const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
+
+  type ToastItem = {
+    id: number;
+    message: string;
+    variant: "success" | "error" | "info";
+  };
+
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  const showToast = (
+    message: string,
+    variant: "success" | "error" | "info"
+  ) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, variant }]);
+  };
+
   // Hämta listan igen när nytt datum väljs
   const fetchSpots = useCallback(
     async (date: string) => {
@@ -54,6 +78,25 @@ const HomePage = () => {
   return (
     <>
       <Container fluid>
+        <ToastContainer
+          position="top-end"
+          className="p-3"
+          style={{ zIndex: 9999 }}
+        >
+          {toasts.map((toast) => (
+            <Toast
+              key={toast.id}
+              onClose={() =>
+                setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+              }
+              delay={3000}
+              autohide
+              className={`toast-${toast.variant} mb-2`}
+            >
+              <Toast.Body>{toast.message}</Toast.Body>
+            </Toast>
+          ))}
+        </ToastContainer>
         <Row>
           <h3 className="text-left mb-3  shadow-sm p-3">Select A Date</h3>
           <Col>
@@ -84,6 +127,7 @@ const HomePage = () => {
                   selectedDate={selectedDate}
                   onBooked={() => fetchSpots(selectedDate)}
                   currentUserId={currentUserId}
+                  showToast={showToast}
                 />
               </Card>
             )}

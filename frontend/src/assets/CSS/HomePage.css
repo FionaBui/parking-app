@@ -2,3 +2,15 @@
   background-color: white;
   border: none;
 }
+.toast-success {
+  background-color: #198754 !important;
+  color: white;
+}
+.toast-error {
+  background-color: #dc3545 !important;
+  color: white;
+}
+.toast-info {
+  background-color: #f2a63d !important;
+  color: white;
+}

@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../store/UserContext";
-import { Form, Button, Nav } from "react-bootstrap";
+import { Toast, ToastContainer, Form, Button, Nav } from "react-bootstrap";
+import "../assets/CSS/LoginPage.css";
 
 const LoginPage = () => {
   const { login } = useContext(UserContext)!;
@@ -11,13 +12,20 @@ const LoginPage = () => {
   const [name, setName] = useState("");
   const [apartment, setApartment] = useState("");
   const [spotLocation, setSpotLocation] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+
+  const showError = (msg: string) => {
+    setToastMessage(msg);
+    setShowToast(true);
+  };
 
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      alert("Please enter your email");
+      showError("Please enter your email");
       return;
     }
     try {
@@ -27,7 +35,7 @@ const LoginPage = () => {
         body: JSON.stringify({ email }),
       });
       if (!res.ok) {
-        alert("Login failed");
+        showError("Login failed");
         return;
       }
       const user = await res.json();
@@ -35,14 +43,14 @@ const LoginPage = () => {
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      alert("Server error");
+      showError("Server error");
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !apartment) {
-      alert("Please fill in all fields");
+      showError("Please fill in all fields");
       return;
     }
     try {
@@ -59,23 +67,39 @@ const LoginPage = () => {
 
       const user = await res.json();
       if (!res.ok) {
-        alert(user.error || "Registration failed");
+        showError(user.error || "Registration failed");
         return;
       }
       login(user);
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      alert("Server error");
+      showError("Server error");
     }
   };
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
+      <ToastContainer
+        position="top-end"
+        className="p-3"
+        style={{ zIndex: 9999 }}
+      >
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={3000}
+          autohide
+          className="toast-error"
+        >
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
       <Nav variant="pills" className="justify-content-center mb-4">
         <Nav.Item>
           <Nav.Link
             active={activeTab === "login"}
             onClick={() => setActiveTab("login")}
+            className={activeTab === "login" ? "selected" : "unselected"}
           >
             Login
           </Nav.Link>
@@ -84,6 +108,7 @@ const LoginPage = () => {
           <Nav.Link
             active={activeTab === "register"}
             onClick={() => setActiveTab("register")}
+            className={activeTab === "register" ? "selected" : "unselected"}
           >
             Register
           </Nav.Link>
@@ -110,8 +135,8 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Group>
-          <Button type="submit" variant="primary" className="w-100">
-            Sign in
+          <Button type="submit" className="w-100 login">
+            Login
           </Button>
         </Form>
       )}
@@ -157,7 +182,7 @@ const LoginPage = () => {
             />
           </Form.Group>
 
-          <Button type="submit" variant="success" className="w-100">
+          <Button type="submit" className="w-100 login">
             Create Account
           </Button>
         </Form>

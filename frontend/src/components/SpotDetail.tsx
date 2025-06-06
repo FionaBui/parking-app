@@ -8,6 +8,7 @@ type Props = {
   selectedDate: string;
   onBooked: () => void;
   currentUserId: number;
+  showToast: (msg: string, variant: "success" | "error" | "info") => void;
 };
 
 function SpotDetails({
@@ -15,6 +16,7 @@ function SpotDetails({
   selectedDate,
   onBooked,
   currentUserId,
+  showToast,
 }: Props) {
   const [startTime, setStartTime] = useState("00:00");
   const [endTime, setEndTime] = useState("23:00");
@@ -50,7 +52,7 @@ function SpotDetails({
 
   const handleUpdateSpot = async () => {
     if (startTime >= endTime) {
-      alert("start time must be before end time");
+      showToast("start time must be before end time", "info");
       return;
     }
     const res = await fetch(
@@ -68,7 +70,7 @@ function SpotDetails({
       }
     );
     if (res.ok) {
-      alert("Spot updated");
+      showToast("Spot updated", "success");
       onBooked();
     }
   };
@@ -79,18 +81,19 @@ function SpotDetails({
       { method: "DELETE" }
     );
     if (res.ok) {
+      showToast("Listing cancelled successfully", "info");
       onBooked();
     }
   };
 
   const handleBooking = async () => {
     if (rentStartTime >= rentEndTime) {
-      alert("Start time must be before end time");
+      showToast("Start time must be before end time", "error");
       return;
     }
 
     if (!selectedSpot.start_time || !selectedSpot.end_time) {
-      alert("This spot is not available at this time");
+      showToast("This spot is not available at this time", "info");
       return;
     }
 
@@ -98,11 +101,12 @@ function SpotDetails({
       rentStartTime < selectedSpot.start_time.slice(0, 5) ||
       rentEndTime > selectedSpot.end_time.slice(0, 5)
     ) {
-      alert(
+      showToast(
         `❗ You can only book between ${selectedSpot.start_time.slice(
           0,
           5
-        )} and ${selectedSpot.end_time.slice(0, 5)}`
+        )} and ${selectedSpot.end_time.slice(0, 5)}`,
+        "error"
       );
       return;
     }
@@ -128,7 +132,7 @@ function SpotDetails({
       }),
     });
     if (res.ok) {
-      alert("✅ Booking successful!");
+      showToast("Booking successful!", "success");
       onBooked();
     }
   };
@@ -141,7 +145,7 @@ function SpotDetails({
       }
     );
     if (res.ok) {
-      alert("Booking cancelled");
+      showToast("Booking cancelled!", "info");
       onBooked();
     }
   };

@@ -1,0 +1,17 @@
+.toast-error {
+  background-color: #dc3545 !important; /* đỏ */
+  color: white;
+}
+.selected.active {
+  background-color: #299ebb !important;
+  color: white !important;
+  border-radius: 0.375rem;
+}
+.unselected {
+  color: #52bcd6ca !important;
+}
+.login {
+  background-color: #299ebb !important;
+  color: white !important;
+  border-radius: 0.375rem;
+}
