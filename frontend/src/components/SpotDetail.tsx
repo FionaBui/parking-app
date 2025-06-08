@@ -3,6 +3,7 @@ import type { SpotStatus } from "../types";
 import { Card, Button, Form, Alert } from "react-bootstrap";
 import "../assets/CSS/SpotDetail.css";
 
+// Props från förälder: vald plats, datum, callback, användar-id, toastfunktion
 type Props = {
   selectedSpot: SpotStatus;
   selectedDate: string;
@@ -18,12 +19,14 @@ function SpotDetails({
   currentUserId,
   showToast,
 }: Props) {
+  // Tillstånd för tider och pris
   const [startTime, setStartTime] = useState("00:00");
   const [endTime, setEndTime] = useState("23:00");
   const [price, setPrice] = useState<number>(0);
   const [rentStartTime, setRentStartTime] = useState("00:00");
   const [rentEndTime, setRentEndTime] = useState("23:00");
 
+  // När en ny plats väljs, uppdatera info
   useEffect(() => {
     setStartTime(selectedSpot.start_time?.slice(0, 5) || "00:00");
     setEndTime(selectedSpot.end_time?.slice(0, 5) || "23:00");
@@ -32,17 +35,21 @@ function SpotDetails({
 
   if (!selectedSpot) return null;
 
+  // Hjälpvariabler för att kontrollera status
   const isMineSpot = selectedSpot.renter_id === currentUserId;
   const isOwner = selectedSpot.is_owner;
   const isRented = selectedSpot.is_rented;
   const isAvailable = selectedSpot.is_available;
 
+  // Räkna ut antal timmar
   const durationInHours =
     parseInt(rentEndTime.slice(0, 2)) - parseInt(rentStartTime.slice(0, 2)) ||
     0;
 
+  // Totalpris = pris per timme * antal timmar
   const totalPrice = durationInHours * selectedSpot.price;
 
+  // Kontrollera att vald tid är giltig
   const isValidBookingTime =
     selectedSpot.start_time &&
     selectedSpot.end_time &&
@@ -50,6 +57,7 @@ function SpotDetails({
     rentStartTime >= selectedSpot.start_time.slice(0, 5) &&
     rentEndTime <= selectedSpot.end_time.slice(0, 5);
 
+  // Ägaren uppdaterar sin plats
   const handleUpdateSpot = async () => {
     if (startTime >= endTime) {
       showToast("start time must be before end time", "info");
@@ -75,6 +83,7 @@ function SpotDetails({
     }
   };
 
+  // Ägaren avbokar sin publicerade plats
   const handleCancelAvailability = async () => {
     const res = await fetch(
       `http://localhost:3001/parking-spots/${selectedSpot.spot_id}/availability?date=${selectedDate}&user=${currentUserId}`,
@@ -86,6 +95,7 @@ function SpotDetails({
     }
   };
 
+  // Användaren bokar en plats
   const handleBooking = async () => {
     if (rentStartTime >= rentEndTime) {
       showToast("Start time must be before end time", "error");
@@ -111,13 +121,6 @@ function SpotDetails({
       return;
     }
 
-    console.log("Sending booking:", {
-      spot_id: selectedSpot.spot_id,
-      renter_id: currentUserId,
-      rent_date: selectedDate,
-      rent_start_time: rentStartTime,
-      rent_end_time: rentEndTime,
-    });
     const res = await fetch("http://localhost:3001/rentals", {
       method: "POST",
       headers: {
@@ -137,6 +140,7 @@ function SpotDetails({
     }
   };
 
+  // Användaren avbokar sin bokning
   const handleCancelBooking = async () => {
     const res = await fetch(
       `http://localhost:3001/rentals/cancel?spot=${selectedSpot.spot_id}&user=${currentUserId}&date=${selectedDate}`,
@@ -150,7 +154,7 @@ function SpotDetails({
     }
   };
 
-  // Button
+  // Logik för vad knappen ska visa
   let buttonText = "Book now";
   let isDisabled = false;
   let onClick = handleBooking;
@@ -176,18 +180,20 @@ function SpotDetails({
       ? "You booked this spot"
       : "Busy"
     : isAvailable
-    ? "Available"
-    : "Not available";
+      ? "Available"
+      : "Not available";
 
   return (
     <Card>
       <Card.Body>
         <Card.Title>Spot Detail</Card.Title>
+        {/* Visar om användaren äger platsen */}
         {isOwner ? (
           <>
             <p>
               <strong>Your spot:</strong> {selectedSpot.spot_number}
             </p>
+            {/* Formulär för att uppdatera tider och pris */}
             <Form.Group className="mb-2">
               <Form.Label>Start Time</Form.Label>
               <Form.Control
@@ -215,6 +221,7 @@ function SpotDetails({
                 disabled={isRented}
               />
             </Form.Group>
+            {/* Knappar: uppdatera och avpublicera */}
             {!isRented && (
               <div className="d-flex gap-2">
                 <Button
@@ -243,6 +250,7 @@ function SpotDetails({
           </>
         ) : (
           <>
+            {/* Info för användare som vill hyra */}
             <p>
               <strong>Spot:</strong> {selectedSpot.spot_number}
             </p>
@@ -254,6 +262,7 @@ function SpotDetails({
               {selectedSpot.start_time?.slice(0, 5)} {"- "}
               {selectedSpot.end_time?.slice(0, 5)}
             </p>
+            {/* Formulär om platsen är tillgänglig */}
             {isAvailable && (
               <>
                 <Form.Group className="mb-2">

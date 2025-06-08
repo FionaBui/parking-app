@@ -5,16 +5,23 @@ import { Toast, ToastContainer, Form, Button, Nav } from "react-bootstrap";
 import "../assets/CSS/LoginPage.css";
 
 const LoginPage = () => {
+  // Hämtar login-funktionen från användarkontexten
   const { login } = useContext(UserContext)!;
+
+  // Flikstatus: 'login' eller 'register'
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+
+  // Formulärfält
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [apartment, setApartment] = useState("");
   const [spotLocation, setSpotLocation] = useState("");
+
+  // Toast-meddelanden
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
-
+  // Visar toast-felmeddelanden
   const showError = (msg: string) => {
     setToastMessage(msg);
     setShowToast(true);
@@ -22,6 +29,7 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
+  // Hanterar login-formuläret
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
@@ -39,14 +47,15 @@ const LoginPage = () => {
         return;
       }
       const user = await res.json();
-      login(user);
-      navigate("/");
+      login(user); // Sparar användaren i context
+      navigate("/"); // Går till startsidan
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       showError("Server error");
     }
   };
 
+  // Hanterar register-formuläret
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !apartment) {
@@ -61,7 +70,7 @@ const LoginPage = () => {
           name,
           email,
           apartment_info: apartment,
-          spot_location: spotLocation || undefined,
+          spot_location: spotLocation || undefined, // frivillig
         }),
       });
 
@@ -70,7 +79,7 @@ const LoginPage = () => {
         showError(user.error || "Registration failed");
         return;
       }
-      login(user);
+      login(user); // Direkt inloggning efter registrering
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -79,6 +88,7 @@ const LoginPage = () => {
   };
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
+      {/* Toast-komponent för felmeddelanden */}
       <ToastContainer
         position="top-end"
         className="p-3"
@@ -94,6 +104,8 @@ const LoginPage = () => {
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
       </ToastContainer>
+
+      {/* Navigation tabs för att byta mellan login och register */}
       <Nav variant="pills" className="justify-content-center mb-4">
         <Nav.Item>
           <Nav.Link
@@ -115,6 +127,7 @@ const LoginPage = () => {
         </Nav.Item>
       </Nav>
 
+      {/* Login-formulär */}
       {activeTab === "login" && (
         <Form onSubmit={handleLogin}>
           <Form.Group className="mb-3" controlId="loginEmail">
@@ -140,6 +153,8 @@ const LoginPage = () => {
           </Button>
         </Form>
       )}
+
+      {/* Register-formulär */}
       {activeTab === "register" && (
         <Form onSubmit={handleRegister}>
           <Form.Group className="mb-3" controlId="regName">

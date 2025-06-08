@@ -5,20 +5,26 @@ import type { ProfileData } from "../types";
 import { Container, Row, Col, Card, ListGroup } from "react-bootstrap";
 
 const ProfilePage = () => {
+  // Hämtar användare från context
   const { user } = useContext(UserContext)!;
   const navigate = useNavigate();
+
+  // Tillstånd för profilinformation (hämtas från backend)
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  // useEffect körs vid första render eller när 'user' ändras
   useEffect(() => {
+    // Om användare inte finns → skicka till login
     if (!user) {
       navigate("/login");
       return;
     }
+    // Funktion för att hämta profildata från backend
     const fetchData = async () => {
       try {
         const res = await fetch(`http://localhost:3001/users/${user.id}`);
         const data = await res.json();
-        setProfile(data);
+        setProfile(data); // Sätter profildata i state
       } catch (error) {
         console.error("error loading profile", error);
       }
@@ -26,10 +32,12 @@ const ProfilePage = () => {
     fetchData();
   }, [user, navigate]);
 
+  // Visar "Loading..." tills profildata är klar
   if (!profile) return <p>Loading...</p>;
   return (
     <Container className="mt-4">
       <h2 className="mb-4 text-center">Profile</h2>
+      {/* Vänstra kolumnen: Bokade platser */}
       <Row>
         <Col md={6}>
           <Card>
@@ -38,6 +46,7 @@ const ProfilePage = () => {
               {profile.rentals.length === 0 ? (
                 <p>You haven't booked any parking spots yet.</p>
               ) : (
+                // Lista alla bokningar
                 <ListGroup>
                   {profile.rentals.map((rental) => (
                     <ListGroup.Item key={rental.id}>
@@ -65,6 +74,7 @@ const ProfilePage = () => {
             </Card.Body>
           </Card>
         </Col>
+        {/* Högra kolumnen: Egen parkeringsplats */}
         <Col md="6" className="mt-4 mt-md-0">
           <Card>
             <Card.Header as="h5">Your Parking Spot</Card.Header>
@@ -72,6 +82,7 @@ const ProfilePage = () => {
               {!profile.owner_spot ? (
                 <p>You don't own a parking spot.</p>
               ) : (
+                // Visa ägd plats
                 <ListGroup>
                   <ListGroup.Item>
                     <strong>{profile.owner_spot.location}</strong>

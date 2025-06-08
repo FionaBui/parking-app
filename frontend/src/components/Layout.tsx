@@ -5,11 +5,14 @@ import UserContext from "../store/UserContext";
 import "../assets/CSS/Layout.css";
 
 const Layout = () => {
+  // Hämtar user-objektet och logout-funktion från context
   const { user, logout } = useContext(UserContext)!;
   return (
     <>
+      {/* Navigationsfält högst upp */}
       <Navbar expand="lg" className="mb-4 layout-nav">
         <Container fluid className="mx-4">
+          {/* Logotypen med länk till startsidan */}
           <Navbar.Brand as={Link} to="/" className="text-white brand">
             <img
               src="../../public/Share_Parking_logo.png"
@@ -17,12 +20,17 @@ const Layout = () => {
               className="logo-img"
             />
           </Navbar.Brand>
+          {/* Knapp för att visa/dölja navbar på mindre skärmar */}
           <Navbar.Toggle aria-controls="navbar-nav" />
+
+          {/* Själva menyinnehållet */}
           <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link as={Link} to="/">
+                {/* Hälsning med användarnamn */}
                 Hello {user?.name}!
               </Nav.Link>
+              {/* Om användaren är inloggad, visa profil och logout */}
               {user ? (
                 <>
                   <NavDropdown
@@ -40,6 +48,7 @@ const Layout = () => {
                   </NavDropdown>
                 </>
               ) : (
+                // Om inte inloggad, visa login-länk
                 <Nav.Link as={Link} to="/login">
                   Login
                 </Nav.Link>
@@ -48,6 +57,7 @@ const Layout = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      {/* Här visas sidans innehåll beroende på vilken route som är aktiv */}
       <Container fluid>
         <Outlet />
       </Container>

@@ -3,7 +3,7 @@ import { client } from '../db';
 
 const router = express.Router();
 
-// POST: Add a rental spot 
+// POST: Skapa ny bokning
 router.post('/', async(req:Request, res:Response)=>{
     console.log("Booking request received:", req.body);
     const {spot_id, renter_id, rent_date, rent_start_time, rent_end_time} = req.body

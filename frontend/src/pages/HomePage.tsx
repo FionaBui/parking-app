@@ -1,3 +1,4 @@
+// Importerar React hooks och nödvändiga komponenter
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DateSelector from "../components/DateSelector";
@@ -16,28 +17,34 @@ import {
 import "../assets/CSS/HomePage.css";
 
 const HomePage = () => {
+  // Hämtar användarinfo från Context
   const { user } = useContext(UserContext)!;
   const currentUserId = Number(user?.id);
   const navigate = useNavigate();
 
+  // Sätter dagens datum som förval
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toLocaleDateString("sv-SE", {
       timeZone: "Europe/Stockholm",
     });
   });
-
+  // Tillstånd för vilken plats som valts
   const [selectedSpotId, setSelectedSpotId] = useState<number | null>(null);
+
+  // Alla parkeringsplatser med status
   const [allSpots, setAllSpots] = useState<SpotStatus[]>([]);
 
+  // Typ för Toast-meddelanden
   type ToastItem = {
     id: number;
     message: string;
     variant: "success" | "error" | "info";
   };
-
+  // Lista med Toasts att visa
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
+  // Funktion för att visa ett Toast-meddelande
   const showToast = (
     message: string,
     variant: "success" | "error" | "info"
@@ -46,7 +53,7 @@ const HomePage = () => {
     setToasts((prev) => [...prev, { id, message, variant }]);
   };
 
-  // Hämta listan igen när nytt datum väljs
+  // Hämtar parkeringsplatser för valt datum och användare
   const fetchSpots = useCallback(
     async (date: string) => {
       try {
@@ -63,21 +70,25 @@ const HomePage = () => {
     [currentUserId]
   );
 
+  // Navigerar till login om användare inte är inloggad
   useEffect(() => {
     if (!currentUserId) {
       navigate("/login");
     }
   }, [currentUserId, navigate]);
 
+  // Körs varje gång datumet ändras → hämta nya platser
   useEffect(() => {
     fetchSpots(selectedDate);
   }, [fetchSpots, selectedDate]);
 
+  // Hittar den valda platsens detaljer
   const selectedSpotDetail = allSpots.find((s) => s.spot_id === selectedSpotId);
 
   return (
     <>
       <Container fluid>
+        {/* Container för Toast-meddelanden */}
         <ToastContainer
           position="top-end"
           className="p-3"
@@ -97,6 +108,7 @@ const HomePage = () => {
             </Toast>
           ))}
         </ToastContainer>
+        {/* Datumväljare */}
         <Row>
           <h3 className="text-left mb-3  shadow-sm p-3">Select A Date</h3>
           <Col>
@@ -107,6 +119,7 @@ const HomePage = () => {
           </Col>
         </Row>
       </Container>
+      {/* Karta och detaljer för parkeringsplatser */}
       <Container fluid className="mt-4">
         <Row>
           <h3 className="shadow-sm p-3 mb-3">Pick Your Parking Spot</h3>
@@ -119,6 +132,7 @@ const HomePage = () => {
               />
             </Card>
           </Col>
+          {/* Detaljer visas bara om en plats är vald */}
           <Col md={4}>
             {selectedSpotDetail && (
               <Card className="p-3 shadow">
