@@ -15,7 +15,7 @@ const Layout = () => {
           {/* Logotypen med länk till startsidan */}
           <Navbar.Brand as={Link} to="/" className="text-white brand">
             <img
-              src="/Share_Parking_logo.png"
+              src="/Logo_Parking.png"
               alt="logo-share-parking"
               className="logo-img"
             />
