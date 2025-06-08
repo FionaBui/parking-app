@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "../store/UserContext";
 import { Toast, ToastContainer, Form, Button, Nav } from "react-bootstrap";
 import "../assets/CSS/LoginPage.css";
+import { API_BASE_URL } from "../api";
 
 const LoginPage = () => {
   // Hämtar login-funktionen från användarkontexten
@@ -37,7 +38,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3001/users/login", {
+      const res = await fetch(`${API_BASE_URL}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -63,7 +64,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3001/users/register", {
+      const res = await fetch(`${API_BASE_URL}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,7 +137,7 @@ const LoginPage = () => {
               type="email"
               placeholder="Enter email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="loginPassword">
@@ -145,7 +146,7 @@ const LoginPage = () => {
               type="password"
               placeholder="Enter password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             />
           </Form.Group>
           <Button type="submit" className="w-100 login">
@@ -163,7 +164,7 @@ const LoginPage = () => {
               type="text"
               placeholder="Your name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             />
           </Form.Group>
 
@@ -173,7 +174,7 @@ const LoginPage = () => {
               type="email"
               placeholder="Your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             />
           </Form.Group>
 
@@ -183,7 +184,7 @@ const LoginPage = () => {
               type="text"
               placeholder="Example: 1202 or Lgh 3A"
               value={apartment}
-              onChange={(e) => setApartment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApartment(e.target.value)}
             />
           </Form.Group>
 
@@ -193,7 +194,7 @@ const LoginPage = () => {
               type="text"
               placeholder="Example: A-1"
               value={spotLocation}
-              onChange={(e) => setSpotLocation(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpotLocation(e.target.value)}
             />
           </Form.Group>
 

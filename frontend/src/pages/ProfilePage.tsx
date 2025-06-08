@@ -3,6 +3,7 @@ import UserContext from "../store/UserContext";
 import { useNavigate } from "react-router-dom";
 import type { ProfileData } from "../types";
 import { Container, Row, Col, Card, ListGroup } from "react-bootstrap";
+import { API_BASE_URL } from "../api";
 
 const ProfilePage = () => {
   // Hämtar användare från context
@@ -22,7 +23,7 @@ const ProfilePage = () => {
     // Funktion för att hämta profildata från backend
     const fetchData = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/users/${user.id}`);
+        const res = await fetch(`${API_BASE_URL}/users/${user.id}`);
         const data = await res.json();
         setProfile(data); // Sätter profildata i state
       } catch (error) {

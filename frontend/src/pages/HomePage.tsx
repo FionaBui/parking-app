@@ -15,7 +15,7 @@ import {
   ToastContainer,
 } from "react-bootstrap";
 import "../assets/CSS/HomePage.css";
-
+import { API_BASE_URL } from "../api";
 const HomePage = () => {
   // Hämtar användarinfo från Context
   const { user } = useContext(UserContext)!;
@@ -58,7 +58,7 @@ const HomePage = () => {
     async (date: string) => {
       try {
         const res = await fetch(
-          `http://localhost:3001/parking-spots?date=${date}&user=${currentUserId}`
+          `${API_BASE_URL}/parking-spots?date=${date}&user=${currentUserId}`
         );
         const data = await res.json();
         console.log("date", date);

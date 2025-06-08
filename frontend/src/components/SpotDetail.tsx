@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { SpotStatus } from "../types";
 import { Card, Button, Form, Alert } from "react-bootstrap";
 import "../assets/CSS/SpotDetail.css";
+import { API_BASE_URL } from "../api";
 
 // Props från förälder: vald plats, datum, callback, användar-id, toastfunktion
 type Props = {
@@ -64,7 +65,7 @@ function SpotDetails({
       return;
     }
     const res = await fetch(
-      `http://localhost:3001/parking-spots/${selectedSpot.spot_id}`,
+      `${API_BASE_URL}/parking-spots/${selectedSpot.spot_id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +87,7 @@ function SpotDetails({
   // Ägaren avbokar sin publicerade plats
   const handleCancelAvailability = async () => {
     const res = await fetch(
-      `http://localhost:3001/parking-spots/${selectedSpot.spot_id}/availability?date=${selectedDate}&user=${currentUserId}`,
+      `${API_BASE_URL}/parking-spots/${selectedSpot.spot_id}/availability?date=${selectedDate}&user=${currentUserId}`,
       { method: "DELETE" }
     );
     if (res.ok) {
@@ -121,7 +122,7 @@ function SpotDetails({
       return;
     }
 
-    const res = await fetch("http://localhost:3001/rentals", {
+    const res = await fetch(`${API_BASE_URL}/rentals"`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -143,7 +144,7 @@ function SpotDetails({
   // Användaren avbokar sin bokning
   const handleCancelBooking = async () => {
     const res = await fetch(
-      `http://localhost:3001/rentals/cancel?spot=${selectedSpot.spot_id}&user=${currentUserId}&date=${selectedDate}`,
+      `${API_BASE_URL}/rentals/cancel?spot=${selectedSpot.spot_id}&user=${currentUserId}&date=${selectedDate}`,
       {
         method: "DELETE",
       }
@@ -199,7 +200,7 @@ function SpotDetails({
               <Form.Control
                 type="time"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartTime(e.target.value)}
                 disabled={isRented}
               />
             </Form.Group>
@@ -208,7 +209,7 @@ function SpotDetails({
               <Form.Control
                 type="time"
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value)}
                 disabled={isRented}
               />
             </Form.Group>
@@ -217,7 +218,7 @@ function SpotDetails({
               <Form.Control
                 type="number"
                 value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrice(Number(e.target.value))}
                 disabled={isRented}
               />
             </Form.Group>
@@ -270,7 +271,7 @@ function SpotDetails({
                   <Form.Control
                     type="time"
                     value={rentStartTime}
-                    onChange={(e) => setRentStartTime(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRentStartTime(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group className="mb-2">
@@ -278,7 +279,7 @@ function SpotDetails({
                   <Form.Control
                     type="time"
                     value={rentEndTime}
-                    onChange={(e) => setRentEndTime(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRentEndTime(e.target.value)}
                   />
                 </Form.Group>
                 <p>
